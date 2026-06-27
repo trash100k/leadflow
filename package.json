@@ -1,0 +1,14 @@
+{
+  "name": "leadflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GAELWORX prospecting harness — Claude Code drives discovery, audit, native PDF render, and on-brand Gmail drafts.",
+  "type": "module",
+  "scripts": {
+    "render": "node src/render.js",
+    "render:sample": "node scripts/render-sample.js"
+  },
+  "dependencies": {
+    "playwright-core": "1.49.1"
+  }
+}
