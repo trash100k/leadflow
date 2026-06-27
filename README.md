@@ -42,6 +42,7 @@ src/runWave.js        batch: render payloads + cap/dedup + ledger (+ optional At
 src/ledger.js         dedup + status ledger + daily cap (data/leads.jsonl)
 src/rundown.js        per-lead human rundown (used for the Attio note)
 src/attio.js          push lead + grade + report link + rundown into Attio (CRM)
+src/toAgentMail.js    map a delivery payload -> AgentMail send/draft args (yardworx)
 prompts/              lead-qualification, audit-rubric, email-writing
 n8n/delivery-workflow.sdk.js   reference copy of the n8n delivery workflow
 scripts/render-sample.js       smoke test (writes out/sample-report.pdf)
@@ -90,6 +91,21 @@ The delivery workflow routes on the payload's `mode`:
 ## Scale note (100+)
 The `draft` payload carries the PDF as base64. The `send` path links to a hosted PDF
 instead (no base64), which also keeps the orchestration light at volume.
+
+## AgentMail delivery (yardworx sender) — optional, preferred for sending
+Instead of the n8n Gmail node, sending can go through **AgentMail** from a
+`@yardworx.tech` identity. Claude Code calls AgentMail directly, so n8n isn't needed
+for delivery. `src/toAgentMail.js` maps a `delivery.json` into the AgentMail tool args
+(first touch: HTML body + report link, no attachment; reply: PDF attached).
+
+One-time setup (you):
+1. In AgentMail, **add + verify the `yardworx.tech` domain** (publish the MX/SPF/DKIM/
+   DMARC records it gives you — this also covers most of `DELIVERABILITY.md` Phase 0).
+2. Claude Code then creates the inbox `zach@yardworx.tech` and sends per lead.
+
+Status: AgentMail org is connected, but `yardworx.tech` is **not yet added** (create
+returns "Domain not found") and there are 0 inboxes — so this path is ready in code but
+waiting on domain verification.
 
 ## CRM sync (Attio)
 Each AUDIT lead can be pushed into Attio: a company record (name + domain), optional
