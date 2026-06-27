@@ -48,6 +48,14 @@ export async function counts() {
   return { total: rows.length, ...by, DONE: by.DONE || 0 };
 }
 
+// How many of a given status were logged on a calendar date (default: today, UTC).
+// Used to enforce the daily send cap during a warm-up ramp.
+export async function countOnDate(statuses = ['SENT', 'DONE'], date = new Date().toISOString().slice(0, 10)) {
+  const set = new Set(Array.isArray(statuses) ? statuses : [statuses]);
+  const rows = await readLedger();
+  return rows.filter((r) => set.has(r.status) && (r.logged_at || '').slice(0, 10) === date).length;
+}
+
 // CLI
 if (import.meta.url === `file://${process.argv[1]}`) {
   const [, , cmd, ...rest] = process.argv;
@@ -59,7 +67,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(await seenBefore(rest[0], rest.slice(1).join(' ')));
   } else if (cmd === 'count') {
     console.log(JSON.stringify(await counts(), null, 2));
+  } else if (cmd === 'today') {
+    console.log(await countOnDate(['SENT', 'DONE']));
   } else {
-    console.log('usage: ledger.js add <json> | seen <url> <name> | count');
+    console.log('usage: ledger.js add <json> | seen <url> <name> | count | today');
   }
 }

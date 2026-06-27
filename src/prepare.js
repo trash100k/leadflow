@@ -4,11 +4,13 @@
 //
 // Input file shape:
 // {
-//   "brief": { sender_name, sender_title?, sender_email?, sender_phone?, geo, industry, date? },
+//   "brief": { sender_name, sender_title?, sender_email?, sender_phone?, geo, industry, date?,
+//              mode?('draft'|'send'), company_address?, unsubscribe_url?|unsubscribe_mailto? },
 //   "lead":  {
 //     route, name, url, email, manual_contact?,   // email = recipient ADDRESS
+//     report_url?,                                 // hosted report card link (first touch)
 //     audit: { ...see audit-rubric.md... },
-//     draft: { subject, paragraphs[], attachment_label? }   // the written email
+//     draft: { subject, paragraphs[], report_cta? }   // the written email
 //   }
 // }
 //
@@ -43,7 +45,8 @@ export async function prepareLead(input) {
   const { base64, bytes } = await renderToFile(html, pdfPath);
 
   // 2) Wrap the email. `lead.email` is the recipient address; `lead.draft` is the
-  // written content (subject + paragraphs).
+  // written content (subject + paragraphs). First touch links to the hosted report
+  // (lead.report_url) — never a cold attachment.
   const em = lead.draft || {};
   const { html: htmlBody, text: textBody } = buildEmail({
     paragraphs: em.paragraphs || [],
@@ -51,15 +54,24 @@ export async function prepareLead(input) {
     sender_title: brief.sender_title,
     sender_email: brief.sender_email,
     sender_phone: brief.sender_phone,
-    attachment_label: em.attachment_label || 'your GAELWORX website report card (PDF)',
+    report_url: lead.report_url || em.report_url || '',
+    report_cta: em.report_cta,
+    company_address: brief.company_address,
+    unsubscribe_url: brief.unsubscribe_url,
+    unsubscribe_mailto: brief.unsubscribe_mailto || brief.sender_email,
   });
 
-  // 3) Delivery payload for the n8n Gmail draft node.
+  // 3) Delivery payload for the n8n delivery workflow.
+  //    mode 'draft'  -> Gmail draft/create (review; may attach the PDF for testing)
+  //    mode 'send'   -> Gmail message/send (first touch: report LINK, no attachment)
+  //    The reply follow-up attaches the real PDF (pdf_base64 carried for that path).
   const payload = {
+    mode: brief.mode || 'draft',
     sendTo: lead.email,
     subject: em.subject || `A quick look at ${lead.name} online`,
     htmlBody,
     textBody,
+    report_url: lead.report_url || em.report_url || '',
     filename: `GAELWORX-Report-${base}.pdf`,
     pdf_base64: base64,
     business: lead.name,
