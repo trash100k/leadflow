@@ -130,21 +130,25 @@ Keep going / over-pull until the AUDIT count hits the target (some route PITCH/S
 - **n8n** `GAELWORX Delivery` (`sWZvE2db8q7bmatR`): draft|send routing if Gmail OAuth
   is attached. Optional; Attio + AgentMail cover this campaign.
 
-## Solar variant — the n8n board (Sonnet-with-minimal-effort)
-For **solar installers**, the same wedge (good reviews + weak site → free audit
-offer from AgentMail) runs as an n8n board: **GAELWORX Solar Audit Wedge**
-(`4gJ6e1tulxMzvgVo`) — see `n8n/solar-audit-wedge.md`.
-- Deterministic nodes do discovery + the **good-reviews-bad-site** filter + scoped
-  **research layers** (site signals; expand for solar: financing, NABCEP/licenses,
-  service-area, panel brands, review themes). A **Claude Sonnet** agent node then only
-  has to write the thoughtful first-touch email + a light score read.
-- **No PDF at first touch** (tease); the branded report card is rendered on REPLY by
-  this skill / Claude Code.
-- Wire before running: a Search-API endpoint + cred, an Anthropic cred, and the
-  AgentMail draft endpoint + Bearer cred (`gaelworx@agentmail.to`). Keep as drafts
-  until deliverability Phase 0.
-- To go deeper per lead, add research nodes before the Sonnet node — that's the
-  "more scoped research layers" lever.
+## Solar variant — runs FROM CLAUDE CODE (no n8n creds)
+**This pipeline runs from here, not inside n8n.** Do NOT put auths in n8n. The n8n
+board **`HTmsHJ7MhuyYGOXq`** ("GAELWORX Solar Runbook (Claude-run)") is just the
+**visual checklist** — each node is a step, its sticky names the MCP tool you
+already have + how to use it. Walk it node by node: do the step with your tool,
+**check it off (TaskCreate todo), move to the next node.** See `n8n/solar-audit-wedge.md`.
+(The earlier credentialed board `4gJ6e1tulxMzvgVo` is archived — it needed creds.)
+
+Same wedge (good reviews + weak site → free audit offer), scoped to solar with
+deeper **research layers** (financing, NABCEP/license, service-area, panel brands,
+review themes) added at the research step. **No PDF at first touch** — the report
+card renders on REPLY.
+
+**First-touch CTA = trust via mailto to your Gmail.** No cold attachment, no raw
+Drive/GitHub link. Use `src/emailTemplate.js` `cta_mailto: "zach@gaelworx.com"`
+(+ `cta_label: "Send me my report"`) → a pre-filled mailto button that opens the
+prospect's own mail client addressed to your real Workspace address. Always set
+**Reply-To `zach@gaelworx.com`** on the AgentMail draft so a plain reply also lands
+in your Gmail. Secondary CTA: Google Calendar link; hot leads: a personalized Loom.
 
 ## Key constants
 - Repo: `trash100k/leadflow` · Attio workspace: GaelWorx · Zach member id:

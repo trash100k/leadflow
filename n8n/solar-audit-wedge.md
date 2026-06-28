@@ -1,41 +1,33 @@
-# n8n board: GAELWORX Solar Audit Wedge
+# n8n board: GAELWORX Solar Runbook (Claude-run)
 
-**Workflow id:** `4gJ6e1tulxMzvgVo` · project: Zachary Isaacson (gaelworx.com) ·
-URL: https://gaelworx.app.n8n.cloud/workflow/4gJ6e1tulxMzvgVo
+**Canonical board:** `HTmsHJ7MhuyYGOXq` — "GAELWORX Solar Runbook (Claude-run)" ·
+https://gaelworx.app.n8n.cloud/workflow/HTmsHJ7MhuyYGOXq
 
-The "Sonnet-with-minimal-effort" board: deterministic discovery + research do the
-heavy lifting; the Sonnet node only writes the email.
+**Runs from Claude Code, not n8n.** No credentials live in n8n. The board is a
+**visual checklist**: each node is a step, sticky notes name the MCP tool the model
+already has + how to use it. The model does the step, checks it off, moves to the
+next node. (Use the TaskCreate todo list to track the check-offs.)
 
-## Flow
-`Run Solar Batch` → `Brief` (geo, target, min_rating, min_reviews) →
-`Discover Solar (search API)` → `Parse to Leads` → `Each Lead` (loop, batch 1):
-- `Fetch Site` (GET homepage, text) → `Extract Signals` (Code: viewport, tel,
-  mailto, JSON-LD, forms, builder, title, on-page email; computes `weak`) →
-- `Good Reviews + Weak Site?` (IF: rating ≥ min AND reviews ≥ min AND weak)
-  - **true** → `Audit + Write Email` (Claude Sonnet 4.6 + structured output:
-    route, contact_email, subject, body, top_finding, light scores) →
-    `Normalize Output` → `AgentMail Draft` (HTTP) → `Log Done`
-  - **false** → `Log Skip`
-→ `Batch Complete`.
+> The earlier credentialed auto-executing board (`4gJ6e1tulxMzvgVo`,
+> "GAELWORX Solar Audit Wedge") is **archived** — it required n8n creds, which we
+> don't use. Kept only as a reference shape.
 
-## Wire before running (placeholders in the board)
-1. **Discover Solar** — set the search/enrichment endpoint (Nimble / SerpAPI /
-   Google Places) + a `Search API` header credential. It must return a JSON list of
-   `{name, website, rating, reviews, phone}` (Parse to Leads is tolerant of
-   results/data/leads/array shapes).
-2. **Claude Sonnet** — attach an `Anthropic` credential.
-3. **AgentMail Draft** — set the AgentMail create-draft endpoint for
-   `gaelworx@agentmail.to` + a Bearer `AgentMail` credential. Body `{to,subject,text}`.
+## The steps (each = a tool the model runs)
+1. **Brief** — solar installers + metro + target N.
+2. **Discover** — `mcp__Nimble__nimble_search` (focus location) + `mcp__Exa__web_search_exa`, over-pull ~3×; exclude directories/chains.
+3. **Dedup** — `node src/ledger.js seen <url> "<name>"` + `mcp__Attio__search-records` (companies by domain).
+4. **Research** — `mcp__Nimble__nimble_extract` (homepage + contact, simplified_html); probe the saved file with python. Solar layers: financing, NABCEP/license, service-area, panel brands, review themes.
+5. **Filter** — keep good reviews (≥4.5 / ≥25) + weak site; route AUDIT / PITCH_OTHER / SKIP. Never fabricate.
+6. **Write email (Sonnet)** — thoughtful first-touch, lead with the one concrete finding, **no PDF**.
+7. **Draft** — `mcp__AgentMail__create_draft` from `gaelworx@agentmail.to`; **Reply-To `zach@gaelworx.com`**; no attachment.
+8. **CRM** — `mcp__Attio__upsert-record` companies + people; `create-note` (rundown); `create-task` (Zach `e40f1558-…`).
+9. **Ledger** — `node src/ledger.js add <json>`.
+10. **On reply** — render the report card via the kit (`node src/prepare.js` / `render_report.py`) → host → attach the PDF in the now-warm thread.
 
-## Design choices
-- **Filter = good reviews + weak site** (the original wedge), scoped to solar.
-- **Research layers** live in `Extract Signals` (site health + AI-visibility
-  signals). Expand here for deeper scoping (contact-page fetch, reviews themes,
-  solar-specific checks: financing, NABCEP/licenses, service-area, panel brands).
-- **No PDF at first touch** — the email teases the findings (better deliverability,
-  and you shouldn't cold-attach). The branded report card is rendered on REPLY by
-  the `gaelworx-prospecting` skill / Claude Code.
-- Keep as **drafts** until deliverability Phase 0 (SPF/DKIM/DMARC on a sending
-  subdomain like `outreach.gaelworx.com`) is done.
-
-Reference SDK lives in this repo's git history (created via create_workflow_from_code).
+## First-touch CTA (trust = mailto to your Gmail)
+No PDF cold. Primary CTA is a **pre-filled mailto button to `zach@gaelworx.com`**
+(opens their own mail client to your real address — no third-party domain, no
+tracker). `src/emailTemplate.js` renders it via `cta_mailto` + `cta_label`
+(default "Send me my report"). Always set **Reply-To `zach@gaelworx.com`** so a
+plain reply also lands in your Gmail. Secondary: Google Calendar link; for hot
+leads, a personalized Loom. Avoid raw Drive/GitHub links in cold mail.

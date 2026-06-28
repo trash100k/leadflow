@@ -40,10 +40,18 @@ export function buildEmail(email = {}) {
   const htmlParas = paras.map((p) => `<p style="margin:0 0 16px;">${esc(p)}</p>`).join('\n');
 
   // Single CTA link — a text link (not a big image button) reads less "markety"
-  // and lands better on a cold first touch.
-  const ctaHtml = email.report_url
-    ? `<p style="margin:0 0 16px;"><a href="${esc(email.report_url)}" style="color:${CELTIC_BLOOD};font-weight:700;">${ctaLabel} →</a></p>`
-    : '';
+  // and lands better on a cold first touch. Trust order for FIRST touch (no PDF):
+  //   1) cta_mailto → a pre-filled mailto to your Gmail (most trustworthy: no
+  //      third-party domain, opens their own mail client to your real address).
+  //   2) report_url → a hosted report link (use only on your own/verified domain).
+  // Also set Reply-To: <your Gmail> at send time so a plain reply lands there too.
+  let ctaHtml = '';
+  if (email.cta_mailto) {
+    const subj = encodeURIComponent(email.cta_subject || 'Send my report');
+    ctaHtml = `<p style="margin:0 0 16px;"><a href="mailto:${esc(email.cta_mailto)}?subject=${subj}" style="color:${CELTIC_BLOOD};font-weight:700;">${esc(email.cta_label || 'Send me my report')} →</a></p>`;
+  } else if (email.report_url) {
+    ctaHtml = `<p style="margin:0 0 16px;"><a href="${esc(email.report_url)}" style="color:${CELTIC_BLOOD};font-weight:700;">${ctaLabel} →</a></p>`;
+  }
 
   // CAN-SPAM footer: physical address + opt-out are required for compliance and
   // also help inbox placement.
