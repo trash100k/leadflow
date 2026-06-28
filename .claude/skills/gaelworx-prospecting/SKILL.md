@@ -130,6 +130,22 @@ Keep going / over-pull until the AUDIT count hits the target (some route PITCH/S
 - **n8n** `GAELWORX Delivery` (`sWZvE2db8q7bmatR`): draft|send routing if Gmail OAuth
   is attached. Optional; Attio + AgentMail cover this campaign.
 
+## Solar variant — the n8n board (Sonnet-with-minimal-effort)
+For **solar installers**, the same wedge (good reviews + weak site → free audit
+offer from AgentMail) runs as an n8n board: **GAELWORX Solar Audit Wedge**
+(`4gJ6e1tulxMzvgVo`) — see `n8n/solar-audit-wedge.md`.
+- Deterministic nodes do discovery + the **good-reviews-bad-site** filter + scoped
+  **research layers** (site signals; expand for solar: financing, NABCEP/licenses,
+  service-area, panel brands, review themes). A **Claude Sonnet** agent node then only
+  has to write the thoughtful first-touch email + a light score read.
+- **No PDF at first touch** (tease); the branded report card is rendered on REPLY by
+  this skill / Claude Code.
+- Wire before running: a Search-API endpoint + cred, an Anthropic cred, and the
+  AgentMail draft endpoint + Bearer cred (`gaelworx@agentmail.to`). Keep as drafts
+  until deliverability Phase 0.
+- To go deeper per lead, add research nodes before the Sonnet node — that's the
+  "more scoped research layers" lever.
+
 ## Key constants
 - Repo: `trash100k/leadflow` · Attio workspace: GaelWorx · Zach member id:
   `e40f1558-3a31-48a1-b15d-784299e0d97f` · AgentMail inbox: `gaelworx@agentmail.to`.
