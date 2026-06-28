@@ -1,0 +1,181 @@
+<!--
+================================================================================
+ANNOTATED TEMPLATE — FOR AGENT UNDERSTANDING ONLY. DO NOT RENDER THIS FILE.
+================================================================================
+This file is a READABLE MAP of the report. It shows every place data goes,
+using {{double-brace}} tokens that correspond exactly to fields in
+audit_schema.json. The agent does NOT edit HTML — it writes a JSON object
+(see example_audit.json) and runs render_report.py, which produces the real,
+fully-styled 5-page PDF.
+
+Read this file to understand WHAT goes WHERE. Write the JSON to actually fill it.
+
+Legend:
+  {{field}}            -> a single value from the audit JSON
+  [[loop: array]]      -> repeated block, one per item in that array
+  (( computed ))       -> the renderer calculates this; the agent never sets it
+  // note              -> guidance
+================================================================================
+-->
+
+<!-- ===================== PAGE 1 — SCORECARD ===================== -->
+<page id="1">
+
+  <masthead>
+    GAELWORX  ·  [ Book a Meeting ]  [ Call (369) 212-1203 ]   // fixed brand CTAs, same every page
+    REF: {{meta.ref}}   CLASS: CONFIDENTIAL
+  </masthead>
+
+  <target>
+    Audit Target
+    Business name:  {{business.name}}
+    URL:            {{business.url}}
+    Flags:          [[loop: flags]] {{flag}} [[/loop]]   // only TRUE flags; renderer lights them
+    Overall grade:  (( computed from average of scores ))   // agent does NOT set
+    Average:        (( computed ))
+  </target>
+
+  <section n="02" title="Dimensional Scoring">
+    // All 10 scores render as labeled bars. Each is an integer 1-10.
+    Design / UX ............ {{scores.design}}        // VERIFIED (observed) -> also feeds radar
+    Mobile Experience ...... {{scores.mobile}}        // VERIFIED -> radar
+    Technical SEO .......... {{scores.tech_seo}}      // VERIFIED -> radar
+    Local SEO .............. {{scores.local_seo}}     // estimated
+    Content / E-E-A-T ...... {{scores.content_eeat}}  // estimated
+    AEO .................... {{scores.aeo}}           // estimated
+    GEO .................... {{scores.geo}}           // estimated
+    Agentic Readiness ...... {{scores.agentic}}       // estimated
+    Accessibility .......... {{scores.accessibility}} // estimated
+    CRO .................... {{scores.cro}}           // VERIFIED -> radar
+  </section>
+
+  <charts>
+    Radar chart:        (( built from the 4 VERIFIED scores: design, mobile, tech_seo, cro ))
+    Score distribution: (( built by counting all 10 scores into critical/needs-work/strong ))
+  </charts>
+</page>
+
+
+<!-- ===================== PAGE 2 — FINDINGS ===================== -->
+<page id="2">
+  <masthead> ... same as page 1 ... </masthead>
+
+  <section n="03" title="Forge Report">
+    <col title="What's Working">
+      [[loop: working]]
+        • {{title}} — {{detail}}
+      [[/loop]]   // 2-3 real observed strengths
+    </col>
+    <col title="What's Costing You Leads Now">
+      [[loop: costing]]
+        • {{title}} — {{detail}}
+      [[/loop]]   // 3-4 highest-impact observed problems, most valuable first
+    </col>
+  </section>
+
+  <section n="04" title="Your AI Search Blind Spot">
+    [[loop: ai_blind_spot.paragraphs]] {{paragraph}} [[/loop]]   // 1-2 paras; may contain inline <b>
+    probe block:
+    [[loop: ai_blind_spot.probe]]
+      {{label}} .......... {{status}}   {{note}}   // status in: PRESENT|ABSENT|PARTIAL|UNVERIFIED
+    [[/loop]]
+  </section>
+</page>
+
+
+<!-- ===================== PAGE 3 — AI / AGENTIC / COMPETITORS ===================== -->
+<page id="3">
+  <masthead> ... </masthead>
+
+  <dial>
+    AI Visibility %:  (( computed from (aeo + geo + agentic) / 30 ))   // agent does NOT set
+  </dial>
+
+  <section n="05" title="Agentic & Future Readiness">
+    [[loop: agentic.paragraphs]] {{paragraph}} [[/loop]]
+    probe block:
+    [[loop: agentic.probe]]
+      {{label}} .......... {{status}}   {{note}}
+    [[/loop]]
+  </section>
+
+  <section n="06" title="Local Competitive Position">
+    table:
+    [[loop: competitors]]
+      {{name}} {{you? "(you)"}} | {{rating}}★ · {{reviews}} | {{mobile_call}} | {{schema}} | {{name_domain}} | {{overall}}
+    [[/loop]]
+    // rating + reviews = REAL data. mobile_call/schema/overall = illustrative unless competitor audited.
+    // renderer prints the "illustrative" footnote automatically.
+  </section>
+</page>
+
+
+<!-- ===================== PAGE 4 — LOCAL + ACCESSIBILITY ===================== -->
+<page id="4">
+  <masthead> ... </masthead>
+
+  <section title="Local Position & Reputation">
+    metric cells:
+      Google Rating:    {{local.rating}}★      // REAL
+      Reviews:          {{local.reviews}}       // REAL
+      Local Competitors:{{local.competitor_count}}
+      Map-Pack Rank:    {{local.map_rank}}       // "#?" if unknown
+    gap chart:          (( built from rating + reviews vs. a low visibility baseline ))
+    disconnect:
+      [[loop: local.paragraphs]] {{paragraph}} [[/loop]]   // cite a real review quote if found
+  </section>
+
+  <section n="07" title="Accessibility & Compliance">
+    // RENDERS ONLY IF scores.accessibility <= 6
+    probe block:
+    [[loop: accessibility.probe]]
+      {{label}} .......... {{status}}   {{note}}   // status in: ADEQUATE|SPARSE|MINIMAL|ABSENT|DEAD LINK
+    [[/loop]]
+    priority note: {{accessibility.note}}
+  </section>
+</page>
+
+
+<!-- ===================== PAGE 5 — PLAN + CLOSE + PITCH ===================== -->
+<page id="5">
+  <masthead> ... </masthead>
+
+  <section n="08" title="The 30-Day Plan">
+    timeline (exactly 4 steps):
+    [[loop: plan]]
+      {{week}} — {{title}} — {{detail}}   // phase: "near" (orange dot) or "later" (grey dot)
+    [[/loop]]
+  </section>
+
+  <section n="09" title="Bottom Line">
+    {{bottom_line}}   // EXACTLY 3 sentences: current state -> biggest opportunity -> revenue impact
+  </section>
+
+  <forge>
+    // FIXED GAELWORX content — agent never edits. Renderer injects:
+    [ Book a 15-minute call ]  -> calendar link
+    01 Custom Software     -> gaelworx.com/services/software
+    02 AI Voice Agents     -> gaelworx.com/services/voice-agents
+    03 Workflow Automations-> gaelworx.com/services/automations
+    04 Web Design          -> gaelworx.com/services/web-design
+  </forge>
+</page>
+
+<!--
+================================================================================
+SUMMARY OF AGENT RESPONSIBILITY
+================================================================================
+FILL (write into audit.json):
+  meta, business, scores(×10), flags, working[], costing[],
+  ai_blind_spot{paragraphs,probe}, agentic{paragraphs,probe},
+  local{rating,reviews,competitor_count,map_rank,paragraphs},
+  competitors[], accessibility{probe,note}, plan[×4], bottom_line
+
+NEVER SET (renderer computes/owns):
+  overall grade, average, AI-visibility %, all chart geometry,
+  masthead CTAs, the four service branches, the calendar link, page layout.
+
+THEN RUN:
+  python3 render_report.py audit.json report_card_<slug>.pdf
+================================================================================
+-->

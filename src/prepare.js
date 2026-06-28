@@ -1,6 +1,6 @@
-// Bridge: a finished lead (audit + written email) -> delivery payload for the
-// n8n Gmail draft node. Renders the GAELWORX report card to PDF natively, wraps
-// the email in the on-brand template, and writes out/<slug>.delivery.json.
+// Bridge: a finished lead (real-schema audit + written email) -> rendered PDF
+// (via the official GAELWORX kit) + delivery payload. Writes out/<slug>.audit.json,
+// out/<slug>.pdf, and out/<slug>.delivery.json.
 //
 // Input file shape:
 // {
@@ -9,15 +9,14 @@
 //   "lead":  {
 //     route, name, url, email, manual_contact?,   // email = recipient ADDRESS
 //     report_url?,                                 // hosted report card link (first touch)
-//     audit: { ...see audit-rubric.md... },
+//     audit: { ...FULL object matching audit-kit/.../audit_schema.json... },
 //     draft: { subject, paragraphs[], report_cta? }   // the written email
 //   }
 // }
 //
 // Usage: node src/prepare.js <lead.json>
-import { buildReportCard } from './reportCard.js';
+import { renderAuditToPdf } from './renderKit.js';
 import { buildEmail } from './emailTemplate.js';
-import { renderToFile, closeBrowser } from './render.js';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 
 const slug = (s = '') =>
@@ -33,20 +32,23 @@ export async function prepareLead(input) {
     throw new Error('no verified contact email — log MANUAL_CONTACT instead of preparing a draft');
   }
 
-  const audit = { business: lead.name, url: lead.url, ...(lead.audit || {}) };
-  const date = brief.date || new Date().toISOString().slice(0, 10);
+  const base = slug(lead.name);
+  const today = brief.date || new Date().toISOString().slice(0, 10);
 
-  // 1) Render the branded PDF natively.
+  // 1) Assemble a valid audit object (real kit schema) and render via render_report.py.
+  //    lead.audit is expected to be the full schema; fill meta/business if absent.
+  const audit = { ...(lead.audit || {}) };
+  audit.business = audit.business || { name: lead.name, url: lead.url };
+  audit.meta = audit.meta || { ref: `${base.slice(0, 8).toUpperCase()}-${today.replace(/-/g, '')}`, date: today };
+
   const outDir = new URL('../out/', import.meta.url);
   await mkdir(outDir, { recursive: true });
-  const base = slug(lead.name);
+  const auditPath = new URL(`../out/${base}.audit.json`, import.meta.url).pathname;
   const pdfPath = new URL(`../out/${base}.pdf`, import.meta.url).pathname;
-  const html = buildReportCard(audit, { ...brief, date });
-  const { base64, bytes } = await renderToFile(html, pdfPath);
+  const rendered = await renderAuditToPdf(audit, { auditPath, pdfPath });
 
-  // 2) Wrap the email. `lead.email` is the recipient address; `lead.draft` is the
-  // written content (subject + paragraphs). First touch links to the hosted report
-  // (lead.report_url) — never a cold attachment.
+  // 2) Wrap the email. `lead.email` is the recipient; `lead.draft` is the written
+  //    content. First touch links to the hosted report (lead.report_url).
   const em = lead.draft || {};
   const { html: htmlBody, text: textBody } = buildEmail({
     paragraphs: em.paragraphs || [],
@@ -61,10 +63,7 @@ export async function prepareLead(input) {
     unsubscribe_mailto: brief.unsubscribe_mailto || brief.sender_email,
   });
 
-  // 3) Delivery payload for the n8n delivery workflow.
-  //    mode 'draft'  -> Gmail draft/create (review; may attach the PDF for testing)
-  //    mode 'send'   -> Gmail message/send (first touch: report LINK, no attachment)
-  //    The reply follow-up attaches the real PDF (pdf_base64 carried for that path).
+  // 3) Delivery payload (Attio link / AgentMail / n8n all consume this).
   const payload = {
     mode: brief.mode || 'draft',
     sendTo: lead.email,
@@ -73,7 +72,7 @@ export async function prepareLead(input) {
     textBody,
     report_url: lead.report_url || em.report_url || '',
     filename: `GAELWORX-Report-${base}.pdf`,
-    pdf_base64: base64,
+    pdf_base64: rendered.base64,
     business: lead.name,
     url: lead.url,
   };
@@ -81,7 +80,11 @@ export async function prepareLead(input) {
   const deliveryPath = new URL(`../out/${base}.delivery.json`, import.meta.url).pathname;
   await writeFile(deliveryPath, JSON.stringify(payload, null, 2));
 
-  return { deliveryPath, pdfPath, bytes, base, sendTo: payload.sendTo, subject: payload.subject };
+  return {
+    deliveryPath, auditPath, base,
+    pdfPath: rendered.pdfPath, htmlPath: rendered.htmlPath, bytes: rendered.bytes, tier: rendered.tier,
+    sendTo: payload.sendTo, subject: payload.subject,
+  };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -89,10 +92,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (!inPath) { console.error('usage: node src/prepare.js <lead.json>'); process.exit(1); }
   const input = JSON.parse(await readFile(inPath, 'utf8'));
   const res = await prepareLead(input);
-  await closeBrowser();
-  // Print only a summary — the base64 lives in the delivery.json, not stdout.
   console.log(JSON.stringify({
-    ok: true, business: input.lead.name, sendTo: res.sendTo, subject: res.subject,
-    pdf: `out/${res.base}.pdf (${res.bytes} bytes)`, delivery: `out/${res.base}.delivery.json`,
+    ok: true, business: input.lead.name, sendTo: res.sendTo, subject: res.subject, render: res.tier,
+    pdf: res.pdfPath ? `out/${res.base}.pdf (${res.bytes} bytes)` : `out/${res.base}.html (html-only)`,
+    audit: `out/${res.base}.audit.json`, delivery: `out/${res.base}.delivery.json`,
   }, null, 2));
 }

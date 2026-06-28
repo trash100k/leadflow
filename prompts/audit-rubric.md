@@ -1,55 +1,41 @@
-# GAELWORX — Website Audit Rubric
+# GAELWORX — Website Audit Rubric (official kit)
 
-Score a verified business site across **ten dimensions, 0–10**. Four are
-**VERIFIED** — they must come from *direct observation* of the live site, not
-assumption. The renderer computes the average and letter grade; **you never set
-grade or average.**
+**Authoritative spec:** `audit-kit/gaelworx_audit_kit/audit_schema.json` and
+`audit-kit/gaelworx_audit_kit/AGENT_PROMPT.md`. Start every audit from
+`example_audit.json` and replace the values. Your only creative output is a valid
+`audit.json`; the renderer owns grade/average/AI-% math, charts, branding, layout.
 
-## The ten dimensions
-| key | dimension | verified? | what to look at |
-|---|---|---|---|
-| `design` | Visual Design | ✅ | layout, hierarchy, modernity, contrast |
-| `mobile` | Mobile Experience | ✅ | reflow on phones, tap targets, readable hero |
-| `tech_seo` | Technical SEO | ✅ | titles/meta, schema, headings, indexability |
-| `cro` | Conversion (CRO) | ✅ | click-to-call, forms, CTAs above the fold |
-| `performance` | Performance / Speed | – | LCP, image weight, render-blocking |
-| `content` | Content & Messaging | – | services, pricing, service-area pages |
-| `trust` | Trust & Social Proof | – | reviews on-site, credentials, guarantees |
-| `local_seo` | Local SEO | – | NAP consistency, GBP linkage, local pages |
-| `accessibility` | Accessibility | – | alt text, contrast, semantics |
-| `branding` | Branding | – | logo use, consistency, voice |
+## The ten dimensions (each integer 1–10)
+`design`, `mobile`, `tech_seo`, `local_seo`, `content_eeat`, `aeo`, `geo`,
+`agentic`, `accessibility`, `cro`
 
-## Rules
-- Each score needs a **specific, concrete `note`** tied to what you actually saw
-  ("phone number is an image, not click-to-call"), never generic ("could improve").
-- **`top_findings`**: 2–4 of the most concrete, costly issues, written in plain
-  owner-facing language (lost calls/leads), not jargon. These feed the email.
-- **`competitors`**: 2–3 REAL competitors in the same geo, each with a one-line
-  `edge` (what they do better). Verify they exist — never invent.
-- **`bottom_line`**: exactly **3 sentences** — situation, the fastest wins, the
-  competitive stakes.
-- Never fabricate a score, note, review, competitor, or email.
+- **VERIFIED from direct observation** (feed the radar — be rigorous):
+  `design`, `mobile`, `tech_seo`, `cro`
+- **Reasoned estimates** (feed the bar grid only):
+  `local_seo`, `content_eeat`, `aeo`, `geo`, `agentic`, `accessibility`
+- Do **not** set grade, average, or AI-visibility % — the renderer computes them.
 
-## Audit JSON shape
-```json
-{
-  "business": "Name",
-  "url": "domain.com",
-  "scores": {
-    "design":      {"score": 4, "note": "..."},
-    "mobile":      {"score": 3, "note": "..."},
-    "tech_seo":    {"score": 5, "note": "..."},
-    "cro":         {"score": 2, "note": "..."},
-    "performance": {"score": 5, "note": "..."},
-    "content":     {"score": 6, "note": "..."},
-    "trust":       {"score": 4, "note": "..."},
-    "local_seo":   {"score": 5, "note": "..."},
-    "accessibility":{"score": 4, "note": "..."},
-    "branding":    {"score": 6, "note": "..."}
-  },
-  "verified": ["design", "mobile", "tech_seo", "cro"],
-  "top_findings": ["...", "..."],
-  "competitors": [{"name": "...", "url": "...", "edge": "..."}],
-  "bottom_line": "Three sentences."
-}
-```
+## Flags (the renderer lights them; include only if TRUE)
+`AGENT-BLIND` if `agentic<=3` · `AI-INVISIBLE` if `aeo+geo<=5` ·
+`A11Y-RISK` if `accessibility<=4` · `NO-LOCAL` if `local_seo<=3`
+
+## Required sections (see schema for exact shapes)
+- `working`: 2–3 observed strengths `{title, detail}`
+- `costing`: 3–4 problems, most valuable first `{title, detail}`
+- `ai_blind_spot`: `{paragraphs[] (inline <b> ok; cite a real local query), probe[{label,status,note?}]}`
+  — status ∈ PRESENT | ABSENT | PARTIAL | UNVERIFIED
+- `agentic`: `{paragraphs[], probe[]}`
+- `local`: `{rating, reviews, competitor_count, map_rank, paragraphs[]}` — rating + reviews MUST be real (GBP)
+- `competitors`: up to 4 incl. target (`you:true`); rating+reviews REAL, other columns illustrative
+- `accessibility`: `{probe[], note}` — only renders when `accessibility<=6`
+- `plan`: exactly 4 `{week, title, detail, phase}` — weeks 1–2 `near`, 3–4 `later`
+- `bottom_line`: exactly 3 sentences — current state → biggest opportunity → revenue impact
+
+## Render
+`python3 audit-kit/gaelworx_audit_kit/render_report.py audit.json report_card.pdf`
+(or via `node src/prepare.js <lead.json>`, which writes the audit.json and calls the kit).
+Three-tier fallback (chromium → weasyprint → html-only) always produces a deliverable.
+
+## Never fabricate
+A score, review, competitor, statistic, or email. Where unobserved, use the
+documented status values rather than guessing. Better to skip than to invent.

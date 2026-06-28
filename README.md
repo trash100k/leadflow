@@ -19,8 +19,9 @@ reduced to a reliable delivery connector.
 3. **Audit + route** — 10-dimension audit (4 verified by observation), competitors,
    3-sentence bottom line; route `AUDIT` / `PITCH_OTHER` / `SKIP`.
    `prompts/audit-rubric.md`.
-4. **Render PDF** — `src/reportCard.js` → `src/render.js` (Chromium `page.pdf()`),
-   full brand fidelity.
+4. **Render PDF** — write a real-schema `audit.json` and run the **official kit**
+   `audit-kit/gaelworx_audit_kit/render_report.py` (via `src/renderKit.js` /
+   `src/prepare.js`). The kit owns layout, charts, branding, grade math.
 5. **Write email** — fully AI, on-brand, leads with the single most concrete
    finding. `prompts/email-writing.md` + `src/emailTemplate.js`.
 6. **Deliver** — `src/prepare.js` builds the payload; one `execute_workflow` call
@@ -34,10 +35,13 @@ The **wave** repeats in small batches until the ledger shows the target number o
 ## Layout
 
 ```
-src/reportCard.js     GAELWORX report-card HTML (from the brand source of truth)
+audit-kit/gaelworx_audit_kit/  OFFICIAL renderer + schema (render_report.py,
+                      audit_schema.json, example_audit.json, AGENT_PROMPT.md) — source of truth
+src/renderKit.js      calls render_report.py: real-schema audit.json -> branded PDF
 src/emailTemplate.js  on-brand HTML email wrapper + plain-text fallback
-src/render.js         native HTML -> PDF via pre-installed Chromium
-src/prepare.js        one finished lead -> out/<slug>.delivery.json (+ PDF)
+src/prepare.js        one finished lead -> audit.json + PDF (via kit) + delivery.json
+src/reportCard.js     DEPRECATED (early homegrown template; superseded by the kit)
+src/render.js         generic native HTML -> PDF (used for ad-hoc HTML, not the report)
 src/runWave.js        batch: render payloads + cap/dedup + ledger (+ optional Attio)
 src/ledger.js         dedup + status ledger + daily cap (data/leads.jsonl)
 src/rundown.js        per-lead human rundown (used for the Attio note)
@@ -52,11 +56,18 @@ DELIVERABILITY.md     Phase 0 checklist — do before any cold send
 ## Setup
 
 ```bash
-npm install            # installs playwright-core; Chromium is pre-provided
-npm run render:sample  # smoke test -> out/sample-report.pdf
+npm install                                   # playwright-core (for ad-hoc node renders)
+pip install playwright==1.55.0                 # for the OFFICIAL kit renderer (render_report.py)
+# Chromium is pre-provided at /opt/pw-browsers (build 1194). Python playwright 1.55
+# expects build 1187 — if its launch can't find the browser, symlink once:
+#   ln -sfn /opt/pw-browsers/chromium-1194 /opt/pw-browsers/chromium-1187
+#   ln -sfn /opt/pw-browsers/chromium_headless_shell-1194 /opt/pw-browsers/chromium_headless_shell-1187
+# Verify: python3 audit-kit/gaelworx_audit_kit/render_report.py \
+#           audit-kit/gaelworx_audit_kit/example_audit.json out/example.pdf   # -> "rendered (chromium)"
 ```
 
-Chromium is found at `/opt/pw-browsers/...`; override with `CHROMIUM_PATH` if needed.
+The kit's three-tier fallback (chromium → weasyprint → html-only) always produces a
+deliverable, so a missing browser degrades to a styled `.html` rather than failing.
 
 ## Prerequisite (one-time, you)
 
