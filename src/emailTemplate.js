@@ -125,10 +125,22 @@ export function buildEmail(email = {}) {
         <!-- ── Header ── -->
         <tr>
           <td style="background:${FORGE};border-bottom:3px solid ${CELTIC_BLOOD};padding:20px 32px 14px;">
-            <div style="font-family:'Cinzel Decorative',Georgia,'Times New Roman',serif;font-weight:900;line-height:0.88;letter-spacing:0;color:${FOG};">
-              <div style="font-size:32px;">G<span style="${AE}">AE</span>L</div>
-              <div style="font-size:32px;">WORX</div>
-            </div>
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td style="vertical-align:middle;">
+                  <div style="font-family:'Cinzel Decorative',Georgia,'Times New Roman',serif;font-weight:900;line-height:0.88;letter-spacing:0;color:${FOG};">
+                    <div style="font-size:32px;">G<span style="${AE}">AE</span>L</div>
+                    <div style="font-size:32px;">WORX</div>
+                  </div>
+                </td>
+                <td style="vertical-align:middle;text-align:right;padding-left:16px;">
+                  <div style="font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;font-size:11px;color:${ASH};line-height:1.8;letter-spacing:0.04em;">
+                    <div>SOFTWARE &nbsp;·&nbsp; AUTOMATION</div>
+                    <div>VOICE AGENTS &nbsp;·&nbsp; WEB PRESENCE</div>
+                  </div>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
 
@@ -150,11 +162,13 @@ export function buildEmail(email = {}) {
               <tr>
                 <td>
                   <div style="font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;">
-                    <div style="font-weight:700;font-size:15px;color:${FOG};">${sender} <span style="font-weight:400;color:${ASH};">· ${title}</span></div>
-                    <div style="font-size:12px;color:${FOG};margin-top:3px;letter-spacing:0.01em;">
+                    <div style="font-weight:700;font-size:15px;color:${FOG};">${sender}</div>
+                    <div style="font-size:12px;color:${ASH};margin-top:2px;">
                       <span style="font-family:'Cinzel Decorative',Georgia,serif;font-weight:900;font-size:11px;letter-spacing:0;color:${FOG};">G<span style="color:${CELTIC_BLOOD};">AE</span>LWORX</span>
+                      <span style="color:${ASH};"> &nbsp;·&nbsp; </span>
+                      <span>${title}</span>
                     </div>
-                    <div style="font-size:11px;color:${ASH};margin-top:3px;letter-spacing:0.02em;">Software &nbsp;·&nbsp; Automation &nbsp;·&nbsp; Voice Agents &nbsp;·&nbsp; Web Presence</div>
+                    <div style="font-size:11px;color:${EMBER};margin-top:3px;letter-spacing:0.04em;font-weight:600;">AUTOMATIC EXECUTION EXPERT</div>
                     ${contactLine ? `<div style="font-size:12px;margin-top:6px;">${contactLine}</div>` : ''}
                   </div>
                 </td>
