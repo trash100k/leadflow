@@ -341,7 +341,11 @@ def dial_svg(scores):
             f'<text x="{cx}" y="{cy+78}" {SANS} font-size="10" fill="{C["ink_dim"]}" text-anchor="middle">Directional readiness index</text></svg>')
 
 def gap_svg(local):
-    rep = min(96, 50 + local["reviews"]/2 + (float(local["rating"])-4)*20)  # reputation strength heuristic
+    try:
+        rating_val = float(local["rating"])
+    except (ValueError, TypeError):
+        rating_val = 0.0
+    rep = max(0, min(96, 50 + local["reviews"]/2 + (rating_val-4)*20))  # reputation strength heuristic
     vis = 28
     W = 520
     def bar(y, label, v, col, note):
@@ -387,7 +391,7 @@ def probe_block(probe):
     return rows.rstrip("\n")
 
 def competitor_rows(comps):
-    sym = {"yes": ('chk','✓'), "no": ('x','✕'), "partial": ('mid','~')}
+    sym = {"yes": ('chk','✓'), "no": ('x','✕'), "partial": ('mid','~'), "broken": ('x','✗')}
     out = ""
     for c in comps:
         cls = ' class="you"' if c["you"] else ""

@@ -56,23 +56,27 @@ const lead  = input.lead || input;
 const em    = lead.draft || {};
 const base  = slug(lead.name);
 
-// ── PDF render (only when full audit data is present) ────────────────────────
+// ── PDF render (only when full audit data is present; skipped on error) ──────
 let pdfPath = null;
 if (lead.audit) {
-  const { renderAuditToPdf } = await import('../src/renderKit.js');
-  const today = brief.date || new Date().toISOString().slice(0, 10);
-  const audit = { ...(lead.audit) };
-  audit.business = audit.business || { name: lead.name, url: lead.url };
-  audit.meta     = audit.meta     || {
-    ref:  `${base.slice(0, 8).toUpperCase()}-${today.replace(/-/g, '')}`,
-    date: today,
-  };
-  await mkdir(join(ROOT, 'out'), { recursive: true });
-  const rendered = await renderAuditToPdf(audit, {
-    auditPath: join(ROOT, 'out', `${base}.audit.json`),
-    pdfPath:   join(ROOT, 'out', `${base}.pdf`),
-  });
-  pdfPath = rendered.pdfPath || null;
+  try {
+    const { renderAuditToPdf } = await import('../src/renderKit.js');
+    const today = brief.date || new Date().toISOString().slice(0, 10);
+    const audit = { ...(lead.audit) };
+    audit.business = audit.business || { name: lead.name, url: lead.url };
+    audit.meta     = audit.meta     || {
+      ref:  `${base.slice(0, 8).toUpperCase()}-${today.replace(/-/g, '')}`,
+      date: today,
+    };
+    await mkdir(join(ROOT, 'out'), { recursive: true });
+    const rendered = await renderAuditToPdf(audit, {
+      auditPath: join(ROOT, 'out', `${base}.audit.json`),
+      pdfPath:   join(ROOT, 'out', `${base}.pdf`),
+    });
+    pdfPath = rendered.pdfPath || null;
+  } catch (e) {
+    process.stderr.write(`PDF skipped (${e.message.slice(0, 80)})\n`);
+  }
 }
 
 // ── Email build ───────────────────────────────────────────────────────────────
