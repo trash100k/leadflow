@@ -1,3 +1,6 @@
+// n8n delivery path: finished lead -> PDF render + delivery payload files.
+// For the Claude Code + MCP path use scripts/deliver.js instead (stdout only, no delivery.json).
+//
 // Bridge: a finished lead (real-schema audit + written email) -> rendered PDF
 // (via the official GAELWORX kit) + delivery payload. Writes out/<slug>.audit.json,
 // out/<slug>.pdf, and out/<slug>.delivery.json.

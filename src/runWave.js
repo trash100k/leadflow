@@ -1,3 +1,7 @@
+// n8n delivery batch runner. For the Claude Code + MCP delivery path this file
+// is not used — delivery is driven directly by Claude Code per lead using
+// scripts/deliver.js (prep) → mcp__Gmail__create_draft → mcp__Attio__* → log-row.
+//
 // Batch the deterministic half of a wave: for a file of qualified leads, render
 // each AUDIT lead's PDF + email into a delivery payload and log every lead to the
 // ledger. The LLM half (discover / audit / write email — done by Claude Code per

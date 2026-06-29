@@ -117,6 +117,7 @@
       "Bash(node src/ledger.js *)",
       "Bash(node scripts/attio-prep.js *)",
       "Bash(node scripts/render-pdf.js *)",
+      "Bash(node scripts/deliver.js *)",
       "Bash(node scripts/build-delivery.js *)",
       "Bash(node scripts/log-row.js *)",
       "Bash(python3 audit-kit/gaelworx_audit_kit/render_report.py *)"

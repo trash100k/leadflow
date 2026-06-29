@@ -1,3 +1,8 @@
+// DEPRECATED for the Claude Code + MCP delivery path.
+// Use scripts/deliver.js instead — it does the same email build plus optional PDF
+// render and pre-builds the Attio note, all to stdout with no file writes.
+//
+// This file is kept for the n8n delivery path (reads out/<slug>.delivery.json).
 // Builds GAELWORX email HTML + delivery payload for a lead. No PDF re-render.
 // Usage: node scripts/build-delivery.js <input.json> <report_url>
 // Input: { brief?: {...}, lead: { name, url, email, draft: {subject, paragraphs} } }
