@@ -1,14 +1,15 @@
-// On-brand HTML email wrapper for GAELWORX cold outreach — deliverability-first.
-// Cold first-touch best practices: light HTML, ONE link (to the hosted report —
-// never a cold attachment), plain human copy, a restrained brand signature, and a
-// CAN-SPAM footer (physical address + opt-out). The brutalist heavy-metal styling
-// stays in the report card itself. The AI writes subject + body paragraphs; this
-// only wraps them.
+// GAELWORX canonical email template — brand truth for every send.
+// Works in AgentMail, Gmail, and any SMTP path. Inline styles only (Gmail strips <style>).
+// Table-based shell for Outlook; div body for clean rendering elsewhere.
+// Same buildEmail() API — the pipeline never changes, only this wrapper does.
 
 const CELTIC_BLOOD = '#C1292E';
-const EMBER = '#E85D04';
-const INK = '#1a1a1a';
-const ASH = '#6b7280';
+const EMBER       = '#E85D04';
+const FORGE       = '#0B0C10';
+const INK         = '#1a1a1a';
+const ASH         = '#6b7280';
+const SMOKE       = '#F4F4F5';
+const BORDER      = '#e4e4e7';
 
 function esc(s) {
   return String(s ?? '')
@@ -18,82 +19,186 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
+// buildEmail(email)
+//
 // email: {
-//   paragraphs: string[],         // AI-written body, one entry per paragraph
-//   sender_name, sender_title?,   // signature
-//   sender_email?, sender_phone?,
-//   report_url?,                  // hosted report card link (first-touch CTA)
-//   report_cta?,                  // link label, default "See your website report card"
-//   company_address?,             // physical address (CAN-SPAM)
-//   unsubscribe_url? | unsubscribe_mailto?  // opt-out (CAN-SPAM)
+//   paragraphs:          string[]   — AI-written body (one per paragraph)
+//   sender_name?:        string     — default "Zach"
+//   sender_title?:       string     — default "Web & Growth"
+//   sender_email?:       string
+//   sender_phone?:       string
+//   calendar_url?:       string     — optional secondary CTA (Google Calendar booking)
+//   cta_mailto?:         string     — first-touch: pre-filled mailto to your Gmail
+//   cta_subject?:        string     — mailto subject
+//   cta_label?:          string     — button label, default "Send me my report"
+//   report_url?:         string     — warm reply: link to hosted PDF
+//   report_cta?:         string     — link label, default "View your report card"
+//   company_address?:    string     — CAN-SPAM physical address
+//   unsubscribe_url?:    string     — opt-out link
+//   unsubscribe_mailto?: string     — opt-out mailto (used if no url)
 // }
 export function buildEmail(email = {}) {
-  const paras = (email.paragraphs || []).filter(Boolean);
-  const sender = esc(email.sender_name || 'The GAELWORX team');
-  const title = email.sender_title ? esc(email.sender_title) : 'GAELWORX';
-  const contactBits = [
-    email.sender_email ? esc(email.sender_email) : null,
-    email.sender_phone ? esc(email.sender_phone) : null,
-  ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+  const paras        = (email.paragraphs || []).filter(Boolean);
+  const sender       = esc(email.sender_name  || 'Zach');
+  const title        = esc(email.sender_title || 'Web & Growth');
+  const senderEmail  = email.sender_email ? esc(email.sender_email) : '';
+  const senderPhone  = email.sender_phone ? esc(email.sender_phone) : '';
 
-  const ctaLabel = esc(email.report_cta || 'See your website report card');
-  const htmlParas = paras.map((p) => `<p style="margin:0 0 16px;">${esc(p)}</p>`).join('\n');
+  // ── Body paragraphs ────────────────────────────────────────────────────────
+  const htmlParas = paras
+    .map(p => `<p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:${INK};">${esc(p)}</p>`)
+    .join('\n        ');
 
-  // Single CTA link — a text link (not a big image button) reads less "markety"
-  // and lands better on a cold first touch. Trust order for FIRST touch (no PDF):
-  //   1) cta_mailto → a pre-filled mailto to your Gmail (most trustworthy: no
-  //      third-party domain, opens their own mail client to your real address).
-  //   2) report_url → a hosted report link (use only on your own/verified domain).
-  // Also set Reply-To: <your Gmail> at send time so a plain reply lands there too.
-  let ctaHtml = '';
+  // ── Primary CTA ────────────────────────────────────────────────────────────
+  // Priority: cta_mailto (trust-first mailto to Gmail) > report_url (hosted link)
+  let primaryCta = '';
   if (email.cta_mailto) {
-    const subj = encodeURIComponent(email.cta_subject || 'Send my report');
-    ctaHtml = `<p style="margin:0 0 16px;"><a href="mailto:${esc(email.cta_mailto)}?subject=${subj}" style="color:${CELTIC_BLOOD};font-weight:700;">${esc(email.cta_label || 'Send me my report')} →</a></p>`;
+    const subj  = encodeURIComponent(email.cta_subject || 'Send my report');
+    const label = esc(email.cta_label || 'Send me my report');
+    primaryCta = `
+        <table border="0" cellpadding="0" cellspacing="0" style="margin:24px 0 8px;">
+          <tr>
+            <td style="background:${CELTIC_BLOOD};border-radius:4px;">
+              <a href="mailto:${esc(email.cta_mailto)}?subject=${subj}"
+                 style="display:inline-block;padding:13px 28px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.02em;">${label} &rarr;</a>
+            </td>
+          </tr>
+        </table>`;
   } else if (email.report_url) {
-    ctaHtml = `<p style="margin:0 0 16px;"><a href="${esc(email.report_url)}" style="color:${CELTIC_BLOOD};font-weight:700;">${ctaLabel} →</a></p>`;
+    const label = esc(email.report_cta || 'View your report card');
+    primaryCta = `
+        <table border="0" cellpadding="0" cellspacing="0" style="margin:24px 0 8px;">
+          <tr>
+            <td style="background:${CELTIC_BLOOD};border-radius:4px;">
+              <a href="${esc(email.report_url)}"
+                 style="display:inline-block;padding:13px 28px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.02em;">${label} &rarr;</a>
+            </td>
+          </tr>
+        </table>`;
   }
 
-  // CAN-SPAM footer: physical address + opt-out are required for compliance and
-  // also help inbox placement.
+  // ── Secondary CTA (calendar) ───────────────────────────────────────────────
+  const calCta = email.calendar_url
+    ? `<p style="margin:8px 0 0;font-size:13px;color:${ASH};">Or <a href="${esc(email.calendar_url)}" style="color:${CELTIC_BLOOD};text-decoration:none;font-weight:600;">book a 15-min call</a> if easier.</p>`
+    : '';
+
+  // ── Signature contact line ─────────────────────────────────────────────────
+  const contactLine = [senderEmail, senderPhone].filter(Boolean)
+    .map(v => `<span style="color:${ASH};">${v}</span>`)
+    .join(`<span style="color:${BORDER};"> &nbsp;·&nbsp; </span>`);
+
+  // ── CAN-SPAM opt-out ──────────────────────────────────────────────────────
   const optOut = email.unsubscribe_url
-    ? `<a href="${esc(email.unsubscribe_url)}" style="color:${ASH};">unsubscribe</a>`
+    ? `<a href="${esc(email.unsubscribe_url)}" style="color:${ASH};text-decoration:underline;">Unsubscribe</a>`
     : email.unsubscribe_mailto
-      ? `<a href="mailto:${esc(email.unsubscribe_mailto)}?subject=unsubscribe" style="color:${ASH};">reply &quot;unsubscribe&quot;</a>`
-      : 'reply "unsubscribe" and I\'ll take you off my list';
-  const addr = email.company_address ? esc(email.company_address) : '';
-  const footerBits = [addr, optOut].filter(Boolean).join(' &nbsp;·&nbsp; ');
+      ? `<a href="mailto:${esc(email.unsubscribe_mailto)}?subject=unsubscribe" style="color:${ASH};text-decoration:underline;">Reply &ldquo;unsubscribe&rdquo;</a>`
+      : `<span style="color:${ASH};">Reply &ldquo;unsubscribe&rdquo; to opt out</span>`;
+  const addr = email.company_address ? `<span style="color:${ASH};">${esc(email.company_address)}</span> &nbsp;&middot;&nbsp; ` : '';
 
+  // ── Full HTML ──────────────────────────────────────────────────────────────
   const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
-<body style="margin:0;padding:0;background:#ffffff;">
-  <div style="max-width:560px;margin:0 auto;padding:24px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:${INK};">
-    ${htmlParas}
-    ${ctaHtml}
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;">
-      <div style="font-weight:700;color:${INK};">${sender}</div>
-      <div style="font-size:13px;color:${ASH};margin-top:2px;">
-        <span style="color:${CELTIC_BLOOD};font-weight:700;">G<span style="color:${EMBER};">AE</span>LWORX</span> &nbsp;·&nbsp; ${title}
-      </div>
-      ${contactBits ? `<div style="font-size:13px;color:${ASH};margin-top:4px;">${contactBits}</div>` : ''}
-    </div>
-    <div style="margin-top:14px;font-size:11px;color:#9ca3af;line-height:1.5;">${footerBits}</div>
-  </div>
-</body></html>`;
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="color-scheme" content="light"/>
+</head>
+<body style="margin:0;padding:0;background:#f9f9f9;">
 
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#f9f9f9;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+
+      <!-- Card -->
+      <table width="100%" border="0" cellpadding="0" cellspacing="0"
+             style="max-width:580px;background:#ffffff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+
+        <!-- ── Header ── -->
+        <tr>
+          <td style="background:${FORGE};border-bottom:3px solid ${CELTIC_BLOOD};padding:18px 32px;">
+            <span style="font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:700;letter-spacing:0.12em;color:#ffffff;">
+              G<span style="color:${CELTIC_BLOOD};">AE</span>L<span style="color:${EMBER};">W</span>ORX
+            </span>
+          </td>
+        </tr>
+
+        <!-- ── Body ── -->
+        <tr>
+          <td style="padding:36px 32px 28px;">
+            <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+              ${htmlParas}
+              ${primaryCta}
+              ${calCta}
+            </div>
+          </td>
+        </tr>
+
+        <!-- ── Signature ── -->
+        <tr>
+          <td style="background:${SMOKE};border-top:1px solid ${BORDER};padding:20px 32px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td>
+                  <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+                    <div style="font-weight:700;font-size:15px;color:${INK};">${sender}</div>
+                    <div style="font-size:13px;color:${ASH};margin-top:2px;">
+                      <span style="font-weight:700;color:${CELTIC_BLOOD};letter-spacing:0.06em;">G<span style="color:${EMBER};">AE</span>LWORX</span>
+                      <span style="color:${BORDER};"> &nbsp;·&nbsp; </span>
+                      <span>${title}</span>
+                    </div>
+                    ${contactLine ? `<div style="font-size:13px;margin-top:5px;">${contactLine}</div>` : ''}
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── Footer (CAN-SPAM) ── -->
+        <tr>
+          <td style="background:${FORGE};padding:14px 32px;">
+            <p style="margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:11px;line-height:1.6;color:#4b4f52;">
+              ${addr}${optOut}
+            </p>
+          </td>
+        </tr>
+
+      </table>
+      <!-- /Card -->
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>`;
+
+  // ── Plain-text fallback ────────────────────────────────────────────────────
   const textOptOut = email.unsubscribe_url
     ? `Unsubscribe: ${email.unsubscribe_url}`
-    : `Don't want these? Reply "unsubscribe" and I'll take you off my list.`;
+    : `Don't want these? Reply "unsubscribe" and I'll remove you.`;
+
+  const calText = email.calendar_url
+    ? `Book a call: ${email.calendar_url}`
+    : '';
+
   const text = [
     ...paras,
-    email.report_url ? `${email.report_cta || 'See your website report card'}: ${email.report_url}` : '',
     '',
-    `— ${email.sender_name || 'The GAELWORX team'}`,
-    `GAELWORX${email.sender_title ? ' · ' + email.sender_title : ''}`,
+    email.cta_mailto
+      ? `${email.cta_label || 'Send me my report'}: mailto:${email.cta_mailto}?subject=${encodeURIComponent(email.cta_subject || 'Send my report')}`
+      : email.report_url
+        ? `${email.report_cta || 'View your report card'}: ${email.report_url}`
+        : '',
+    calText,
+    '',
+    `— ${email.sender_name || 'Zach'}`,
+    `GAELWORX · ${email.sender_title || 'Web & Growth'}`,
     [email.sender_email, email.sender_phone].filter(Boolean).join(' · '),
     '',
     email.company_address || '',
     textOptOut,
-  ].filter((l) => l !== undefined).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  ].filter(l => l !== undefined).join('\n').replace(/\n{3,}/g, '\n\n').trim();
 
   return { html, text };
 }
