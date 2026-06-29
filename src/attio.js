@@ -65,6 +65,14 @@ export async function addNote({ recordId, title, content }, c = cfg()) {
   return out?.data?.id?.note_id;
 }
 
+export async function addTask({ recordId, content, assigneeId }, c = cfg()) {
+  const data = { content };
+  if (assigneeId) data.assignees = [{ referenced_actor_type: 'workspace-member', referenced_actor_id: assigneeId }];
+  if (recordId) data.linked_records = [{ target_object: c.object, target_record_id: recordId }];
+  const out = await api('/tasks', 'POST', { data }, c.key);
+  return out?.data?.id?.task_id;
+}
+
 // input: { brief, lead } (prepare.js shape) + optional report_url on lead
 export async function pushLead(input = {}) {
   const c = cfg();
