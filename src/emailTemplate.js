@@ -120,7 +120,7 @@ export function buildEmail(email = {}) {
 
       <!-- Card — 1px Ash frame + 8px hard black shadow (Brutalist Snap) -->
       <table width="100%" border="0" cellpadding="0" cellspacing="0"
-             style="max-width:580px;background:#ffffff;border:1px solid ${ASH};box-shadow:8px 8px 0 #000000;">
+             style="max-width:580px;background:#F8F4EE;border:1px solid ${ASH};box-shadow:8px 8px 0 #000000;">
 
         <!-- ── Header ── -->
         <tr>
@@ -134,9 +134,10 @@ export function buildEmail(email = {}) {
                   </div>
                 </td>
                 <td style="vertical-align:middle;text-align:right;padding-left:16px;">
-                  <div style="font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;font-size:11px;color:${ASH};line-height:1.8;letter-spacing:0.04em;">
+                  <div style="font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;font-size:11px;color:${ASH};line-height:1.9;letter-spacing:0.04em;text-align:right;">
                     <div>SOFTWARE &nbsp;·&nbsp; AUTOMATION</div>
-                    <div>VOICE AGENTS &nbsp;·&nbsp; WEB PRESENCE</div>
+                    <div>VOICE AGENTS</div>
+                    <div>WEB PRESENCE</div>
                   </div>
                 </td>
               </tr>
