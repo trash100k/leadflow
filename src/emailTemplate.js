@@ -1,5 +1,5 @@
 // GAELWORX canonical email template — brand truth for every send.
-// Wordmark font TBD · Hanken Grotesk body · forge-fire AE treatment.
+// Cinzel Decorative wordmark · Hanken Grotesk body · forge-fire AE treatment.
 // Table-based shell (Outlook); inline styles only (Gmail strips <style>).
 // Same buildEmail() API — the pipeline never changes, only this wrapper does.
 
@@ -110,7 +110,7 @@ export function buildEmail(email = {}) {
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="color-scheme" content="light"/>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
 </head>
 <body style="margin:0;padding:0;background:${COLD_STEEL};">
 
@@ -125,7 +125,7 @@ export function buildEmail(email = {}) {
         <!-- ── Header ── -->
         <tr>
           <td style="background:${FORGE};border-bottom:3px solid ${CELTIC_BLOOD};padding:20px 32px 14px;">
-            <div style="font-family:Georgia,'Times New Roman',serif;font-weight:900;line-height:0.88;letter-spacing:0;color:${FOG};">
+            <div style="font-family:'Cinzel Decorative',Georgia,'Times New Roman',serif;font-weight:900;line-height:0.88;letter-spacing:0;color:${FOG};">
               <div style="font-size:32px;">G<span style="${AE}">AE</span>L</div>
               <div style="font-size:32px;">WORX</div>
             </div>
@@ -152,7 +152,7 @@ export function buildEmail(email = {}) {
                   <div style="font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;">
                     <div style="font-weight:700;font-size:15px;color:${FOG};">${sender}</div>
                     <div style="font-size:13px;color:${ASH};margin-top:2px;">
-                      <span style="font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:12px;letter-spacing:0.06em;color:${FOG};">G<span style="color:${CELTIC_BLOOD};">AE</span>LWORX</span>
+                      <span style="font-family:'Cinzel Decorative',Georgia,serif;font-weight:900;font-size:12px;letter-spacing:0;color:${FOG};">G<span style="color:${CELTIC_BLOOD};">AE</span>LWORX</span>
                       <span style="color:${ASH};"> &nbsp;·&nbsp; </span>
                       <span>${title}</span>
                     </div>
