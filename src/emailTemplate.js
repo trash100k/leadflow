@@ -135,8 +135,9 @@ export function buildEmail(email = {}) {
                 </td>
                 <td style="vertical-align:middle;text-align:right;padding-left:16px;">
                   <div style="font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;font-size:11px;color:${ASH};line-height:1.9;letter-spacing:0.04em;text-align:right;">
-                    <div>SOFTWARE &nbsp;·&nbsp; AUTOMATION</div>
+                    <div>SOFTWARE</div>
                     <div>VOICE AGENTS</div>
+                    <div>AUTOMATION</div>
                     <div>WEB PRESENCE</div>
                   </div>
                 </td>
