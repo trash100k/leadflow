@@ -46,7 +46,7 @@ const AE = `color:${EMBER};background:linear-gradient(to top,${CELTIC_BLOOD},${E
 export function buildEmail(email = {}) {
   const paras       = (email.paragraphs || []).filter(Boolean);
   const sender      = esc(email.sender_name  || 'Zach');
-  const title       = esc(email.sender_title || 'Web & Growth');
+  const title       = esc(email.sender_title || 'Founder');
   const senderEmail = email.sender_email ? esc(email.sender_email) : '';
   const senderPhone = esc(email.sender_phone || '(369) 212-1203');
 
@@ -150,13 +150,12 @@ export function buildEmail(email = {}) {
               <tr>
                 <td>
                   <div style="font-family:'Hanken Grotesk',Helvetica,Arial,sans-serif;">
-                    <div style="font-weight:700;font-size:15px;color:${FOG};">${sender}</div>
-                    <div style="font-size:13px;color:${ASH};margin-top:2px;">
-                      <span style="font-family:'Cinzel Decorative',Georgia,serif;font-weight:900;font-size:12px;letter-spacing:0;color:${FOG};">G<span style="color:${CELTIC_BLOOD};">AE</span>LWORX</span>
-                      <span style="color:${ASH};"> &nbsp;·&nbsp; </span>
-                      <span>${title}</span>
+                    <div style="font-weight:700;font-size:15px;color:${FOG};">${sender} <span style="font-weight:400;color:${ASH};">· ${title}</span></div>
+                    <div style="font-size:12px;color:${FOG};margin-top:3px;letter-spacing:0.01em;">
+                      <span style="font-family:'Cinzel Decorative',Georgia,serif;font-weight:900;font-size:11px;letter-spacing:0;color:${FOG};">G<span style="color:${CELTIC_BLOOD};">AE</span>LWORX</span>
                     </div>
-                    ${contactLine ? `<div style="font-size:13px;margin-top:5px;">${contactLine}</div>` : ''}
+                    <div style="font-size:11px;color:${ASH};margin-top:3px;letter-spacing:0.02em;">Software &nbsp;·&nbsp; Automation &nbsp;·&nbsp; Voice Agents &nbsp;·&nbsp; Web Presence</div>
+                    ${contactLine ? `<div style="font-size:12px;margin-top:6px;">${contactLine}</div>` : ''}
                   </div>
                 </td>
               </tr>
@@ -200,8 +199,8 @@ export function buildEmail(email = {}) {
         : '',
     calText,
     '',
-    `— ${email.sender_name || 'Zach'}`,
-    `GAELWORX · ${email.sender_title || 'Web & Growth'}`,
+    `— ${email.sender_name || 'Zach'} · ${email.sender_title || 'Founder'}`,
+    `GAELWORX · Software · Automation · Voice Agents · Web Presence`,
     [email.sender_email, email.sender_phone].filter(Boolean).join(' · '),
     '',
     email.company_address || '',
