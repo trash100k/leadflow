@@ -1,6 +1,6 @@
 // Upload a PDF to Google Drive using googleapis npm package
 // Usage: node scripts/upload-drive.mjs <pdf-path> <title>
-import { readFileSync } from 'node:fs';
+import { readFileSync, createReadStream } from 'node:fs';
 import { google } from 'googleapis';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +26,7 @@ try {
 
 const drive = google.drive({ version: 'v3', auth });
 
-const pdfBuffer = readFileSync(pdfPath);
+const pdfStream = createReadStream(pdfPath);
 
 try {
   const res = await drive.files.create({
@@ -36,7 +36,7 @@ try {
     },
     media: {
       mimeType: 'application/pdf',
-      body: pdfBuffer,
+      body: pdfStream,
     },
     fields: 'id,webViewLink,name',
   });
