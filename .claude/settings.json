@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "mcp__Attio",
       "mcp__Nimble__nimble_search",
       "mcp__Nimble__nimble_extract",
       "mcp__Nimble__nimble_extract_async",
