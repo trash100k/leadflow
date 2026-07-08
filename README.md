@@ -1,5 +1,10 @@
 # leadflow — GAELWORX prospecting harness
 
+> **New session? Read [`HANDOFF.md`](HANDOFF.md) first.** It's the shortest
+> validated path (AgentMail sends now; PDFs host via GitHub-raw; no n8n / Gmail
+> OAuth / yardworx). The n8n Gmail-draft + base64-attach delivery described below
+> is the older, heavier path and is **superseded for delivery** — kept for reference.
+
 Claude Code is the runtime. It finds and qualifies local leads, audits their
 websites, renders an on-brand GAELWORX **report-card PDF natively** (headless
 Chromium — no Gotenberg), writes a personalized email, and produces a **Gmail

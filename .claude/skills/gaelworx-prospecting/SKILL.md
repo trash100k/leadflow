@@ -11,6 +11,10 @@ description: >-
 
 # GAELWORX Prospecting Pipeline
 
+> **Start with `HANDOFF.md` at the repo root** — it's the shortest validated path
+> (AgentMail sends now, PDFs host via GitHub-raw, no n8n/Gmail-OAuth/yardworx) plus
+> the dead ends not to retry. This skill has the per-lead audit detail.
+
 ## Campaign goal
 Sell **dirt-cheap web design** to local landscapers as the wedge, and onboard them
 to the **yardworx (yrdwrx)** app. The free website **audit report card** is the
@@ -123,10 +127,13 @@ Keep going / over-pull until the AUDIT count hits the target (some route PITCH/S
 ## Delivery channels
 - **Attio (primary for this campaign):** report card lives as a link on the record +
   rundown note (Attio holds links, not embedded PDFs). Done via MCP, no API key.
-- **AgentMail:** inbox `gaelworx@agentmail.to` (default domain; for real cold volume
-  verify a sending subdomain like `outreach.gaelworx.com` — see DELIVERABILITY.md).
-  Attach the PDF **by URL** (`attachments:[{url:<raw_url>,filename}]`) — never inline
-  base64 (too large) and never upload lead data to public/anonymous hosts.
+- **AgentMail (sends NOW, no setup):** primary inbox `zach-gaelworx@agentmail.to`
+  (also `gaelworx@agentmail.to`, `gaelworx-outreach@agentmail.to`). `send_message`
+  returns a real SES message id — the `agentmail.to` default domain works for
+  testing/low volume; verify a sending subdomain only for real cold volume (see
+  DELIVERABILITY.md). Always set **Reply-To `zach@gaelworx.com`**. Attach the PDF
+  **by URL** (`attachments:[{url:<raw_url>,filename}]`) — never inline base64 (too
+  large to pass as a tool param) and never upload lead data to public/anonymous hosts.
 - **n8n** `GAELWORX Delivery` (`sWZvE2db8q7bmatR`): draft|send routing if Gmail OAuth
   is attached. Optional; Attio + AgentMail cover this campaign.
 
@@ -152,6 +159,7 @@ in your Gmail. Secondary CTA: Google Calendar link; hot leads: a personalized Lo
 
 ## Key constants
 - Repo: `trash100k/leadflow` · Attio workspace: GaelWorx · Zach member id:
-  `e40f1558-3a31-48a1-b15d-784299e0d97f` · AgentMail inbox: `gaelworx@agentmail.to`.
+  `e40f1558-3a31-48a1-b15d-784299e0d97f` · AgentMail primary inbox:
+  `zach-gaelworx@agentmail.to` (Reply-To `zach@gaelworx.com`).
 - Brief defaults: sender Zach / GAELWORX / zach@gaelworx.com; mode `draft` until
   deliverability Phase 0 is done.
