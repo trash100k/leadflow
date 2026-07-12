@@ -65,7 +65,14 @@ REST API, not the MCP connector.
 Unchanged from HANDOFF.md: scrape site → 10-dim audit (official kit schema,
 never fabricate) → render PDF → host → Attio (REST) company+person+note+task →
 email if a real address was found (link-first, no attachment) else CALL flag →
-ledger. Two tightenings:
+ledger.
+
+**Outreach render (built):** `node src/reportCardV2.js <audit.json> <out.pdf>`
+— same audit.json in, sales-forward 5-pager out: p1 verdict + scores + "what's
+costing you leads", p2 AI blind spot + competitors + bottom line, p3 Web
+Design as THE FIX (worst 3 dims → build spec) + 30-day plan, p4 Maeve voice
+agents + workflow automations, p5 custom software + **UltraPlan** + booking
+CTA. The official kit remains the deep-dive variant. Two tightenings:
 - Attio writes via REST (§1 rule).
 - Email volume stays ≤15–20/day/inbox and ramps only after DELIVERABILITY.md
   Phase 0 (research: fresh identities warm 2–4 weeks; >0.3% spam-complaint =
