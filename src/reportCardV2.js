@@ -356,8 +356,8 @@ export function buildHtml(audit, opts = {}) {
   ${branch({
     no: '04',
     cat: '01 · The Fix · Web Design',
-    name: 'Your Mark, Forged for the Modern Web',
-    tag: 'Studio-grade interactive sites engineered to drop the visitor’s guard and route the lead straight to the truck.',
+    name: 'Lead Engines, Not Brochures',
+    tag: 'Conversion-tuned local sites and studio-grade interactive reels — every page a magnet, every CTA capturing the contact before the competitor’s page finishes loading.',
     paras: [
       `A rebuilt <b>${esc(biz.url || 'site')}</b> isn’t a paint job — it’s engineered directly against the gaps in this report. Your three weakest dimensions become the build spec:`,
     ],
@@ -386,32 +386,32 @@ export function buildHtml(audit, opts = {}) {
   ${branch({
     no: '02',
     cat: '02 · AI Voice Agents',
-    name: 'Meet Maeve — The Warrior Queen',
-    tag: 'Your pipeline, dialed cold and warm. Speak your campaign. She’ll answer.',
+    name: 'Meet Maeve — A Receptionist That Never Blinks',
+    tag: 'Inbound and outbound — in your voice, on your script, 24/7.',
     paras: [
       `Most calls to small service businesses go unanswered while the crew is on a job — and callers rarely leave voicemail; they call the next name on the list. Maeve answers <b>every</b> call to ${esc(name)} in seconds, books the estimate, qualifies the job, and texts you the summary.`,
-      `Outbound, she works the follow-up list you never get to — yesterday’s quotes, last season’s customers, the review requests.`,
+      `Outbound, she works the list you never get to — recovering yesterday’s quotes, reactivating last season’s customers, chasing the review requests.`,
     ],
     feats: [
-      '24/7 inbound answering — no missed-call leak',
-      'Books estimates straight into your calendar',
-      'Outbound follow-up on quotes & reactivations',
+      'Qualifies leads, books jobs, recovers quotes',
+      'In your voice, on your script — 24/7',
+      'Full reception — no missed-call leak',
       'Every call logged, transcribed, summarized',
     ],
   })}
   ${branch({
     no: '03',
     cat: '03 · Workflow Automations',
-    name: 'Workflow Engines',
-    tag: 'Automatic execution for the modern age. Built once, paid forever.',
+    name: 'Workflow Automations',
+    tag: 'Pipelines that don’t sleep. Built once, paid forever.',
     paras: [
-      `Silent machines that <b>quote, follow up, invoice, and chase reviews while you sleep</b>. The jobs that eat your evenings — estimates, reminders, review requests, rescheduling — run themselves, wired into the site and the phone line.`,
+      `Quiet engines that <b>run the empire after the fires die down</b> — the machines that quote, follow up, invoice, and chase reviews while you sleep, wired into the site and the phone line.`,
     ],
     feats: [
-      'Instant quote follow-up (the first responder wins the job)',
+      'Lead routing — the first responder wins the job',
+      'Billing follow-ups without the awkward calls',
       'Review engine — every happy customer asked, automatically',
-      'Invoice + payment chasing without the awkward calls',
-      'One dashboard — see every lead’s status at a glance',
+      'Document workflows + cross-system bridges',
     ],
   })}
   ${foot(date, 4)}
@@ -423,10 +423,10 @@ export function buildHtml(audit, opts = {}) {
   ${branch({
     no: '01',
     cat: '04 · Custom Software',
-    name: 'An Operational War Room',
-    tag: 'The battlefield is changing. Dashboards that decide. Pipelines that don’t sleep.',
+    name: 'Platforms That Decide',
+    tag: 'Bespoke operational platforms, internal tooling, and trade-shaped applications.',
     paras: [
-      `We ship our own platforms — <b>YardWorx, RepairWorx, SalesWorx, AgentWorx</b> — and engineer custom software for the clans that need their own: voice-logged crews, predictive inventory, dispatch in one cockpit. Systems built once, sharpened forever.`,
+      `The same forge that built <b>YardWorx, RepairWorx, SalesWorx, and AgentWorx</b> — pointed at your business. Voice-logged crews, predictive inventory, dispatch in one cockpit. Systems built once, sharpened forever.`,
     ],
     feats: [
       'Crew + dispatch cockpit built around how you actually run jobs',
@@ -445,7 +445,7 @@ export function buildHtml(audit, opts = {}) {
       <div class="u-cell"><div class="uc-n">GW–01</div><div class="uc-t">Cockpit<br>on top</div></div>
     </div>
   </div>
-  ${ctaBand('Point the sword — pick one branch, or all of them.')}
+  ${ctaBand('Start the forge — one call, no discovery-call theater. You talk to the people who hold the hammer.')}
   <div class="forge-foot">GAELWORX · <b>gaelworx.com</b> · Point the sword. We take care of the battlefield.</div>
   ${foot(date, 5)}
 </div>
