@@ -1,5 +1,10 @@
 # HANDOFF — read this first
 
+> **Update (Jul 2026):** the pipeline is now dual-track — see **`PIPELINES.md`**
+> for the HAS_SITE / NO_SITE plan (spec-site builds, phone-first delivery,
+> Attio via REST). This file's mechanics (render, hosting, AgentMail, dead
+> ends) still hold.
+
 The shortest path that **actually works today**, validated end-to-end. Everything
 here runs from Claude Code with the MCP tools already connected — **zero new
 credentials, no n8n, no Gmail OAuth, no yardworx domain.**
