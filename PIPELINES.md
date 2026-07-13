@@ -68,11 +68,14 @@ email if a real address was found (link-first, no attachment) else CALL flag →
 ledger.
 
 **Outreach render (built):** `node src/reportCardV2.js <audit.json> <out.pdf>`
-— same audit.json in, sales-forward 5-pager out: p1 verdict + scores + "what's
-costing you leads", p2 AI blind spot + competitors + bottom line, p3 Web
-Design as THE FIX (worst 3 dims → build spec) + 30-day plan, p4 Maeve voice
-agents + workflow automations, p5 custom software + **UltraPlan** + booking
-CTA. The official kit remains the deep-dive variant. Two tightenings:
+— same audit.json in, mobile-first 4-pager out (big type, one idea per block):
+P1 THE BLEED (3 short site pain points + grade), P2 THE FIX (worst-3 dims
+from→to + 30-day checklist + CTA), P3 THE LEAKS (4 universal business
+bottlenecks: missed calls, slow quotes, busywork, after-hours), P4 THE FORGE
+(GAELWORX solutions each tagged to the leak it plugs — Maeve, automations,
+software, **UltraPlan** — + CTA). Brand: warm forged-iron palette, blackletter
+(Grenze Gotisch) + Hanken, coin watermark, all embedded. The official kit
+remains the deep-dive variant. Two tightenings:
 - Attio writes via REST (§1 rule).
 - Email volume stays ≤15–20/day/inbox and ramps only after DELIVERABILITY.md
   Phase 0 (research: fresh identities warm 2–4 weeks; >0.3% spam-complaint =
