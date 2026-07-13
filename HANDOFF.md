@@ -102,8 +102,7 @@ since some route PITCH_OTHER/SKIP.
 
 ## Key constants
 
-- **Repo:** `trash100k/leadflow` · **branch:** `main`
-  (update raw URLs to `main` after merge).
+- **Repo:** `trash100k/leadflow` · default branch `main` (raw URLs point here).
 - **AgentMail inboxes (all live, all send now):** `zach-gaelworx@agentmail.to`
   (primary, "Zach · GAELWORX"), `gaelworx@agentmail.to`, `gaelworx-outreach@agentmail.to`.
   Always set **Reply-To `zach@gaelworx.com`** so replies land in the real Gmail.

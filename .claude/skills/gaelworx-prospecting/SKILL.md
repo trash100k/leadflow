@@ -86,8 +86,7 @@ cp out/<slug>.pdf reports/<slug>.pdf && git add -f reports/<slug>.pdf
 git commit -m "Publish <slug> report card" && git push
 # raw URL: https://raw.githubusercontent.com/trash100k/leadflow/<BRANCH>/reports/<slug>.pdf
 ```
-(Confirm reachable: `curl -sI <raw_url>` → 200. Note: branch is currently
-`main`; update to `main` after merge.)
+(Confirm reachable: `curl -sI <raw_url>` → 200. Raw URLs point at `main`.)
 
 **8. Push to Attio** (workspace GaelWorx; via `mcp__Attio__*`):
 - `upsert-record` object `companies`, matching `domains` → {name, domains:[domain],
