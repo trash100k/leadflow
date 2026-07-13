@@ -62,9 +62,9 @@ choices? If yes, it needs another pass.
 ## Concrete rules
 
 **Color & contrast**
-- Body text ≥ 4.5:1 against its background; large text (≥18px, or bold
-  ≥14px) ≥ 3:1. Placeholder text gets the same 4.5:1 — no muted-gray
-  exemption.
+- Body text ≥ 4.5:1 against its background; large text (≥24px regular, or
+  ≥18.7px bold — WCAG's 18pt/14pt-bold thresholds in px) ≥ 3:1. Placeholder
+  text gets the same 4.5:1 — no muted-gray exemption.
 - Tinted neutrals: shift the neutral 0.005–0.015 chroma toward the brand's
   own hue, not toward generic warm beige.
 - Pick a color strategy deliberately, not by default:
@@ -84,7 +84,8 @@ choices? If yes, it needs another pass.
 **Layout**
 - Flexbox for one-dimensional groups, Grid for two-dimensional layouts.
 - Responsive grids with no explicit breakpoint: `repeat(auto-fit,
-  minmax(280px, 1fr))`.
+  minmax(min(280px, 100%), 1fr))` — the `min()` keeps a container narrower
+  than 280px from overflowing horizontally.
 - Vary spacing on purpose for rhythm — don't let every section land on the
   same padding value. Avoid nested cards (a card inside a card).
 - Semantic z-index scale (10/20/30…), never arbitrary values like 999/9999.
