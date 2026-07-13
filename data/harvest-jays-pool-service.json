@@ -1,0 +1,16 @@
+{
+  "name": "Jay's Pool Service",
+  "slug": "jays-pool-service",
+  "phone": "(727) 534-5868",
+  "city": "Port Richey, FL (34668)",
+  "owner_name": "Jeffery Fitzpatrick (likely goes by \"Jay\")",
+  "owner_name_confidence": "inferred",
+  "services": [
+    "Swimming pool cleaning & maintenance"
+  ],
+  "service_area": [],
+  "reviews": [],
+  "photos": [],
+  "hours": null,
+  "source_notes": "No website and no verifiable Facebook page found. Phone comes from a single source (Pasco Search business directory) but its listed address (8831 Cairo Ln, Port Richey, FL 34668) matches the Florida Sunbiz principal address exactly, so it is treated as reasonably reliable though not independently cross-verified. GBP data (via Nimble location search): 5.0 rating, 45 reviews, place_id ChIJdxw2UJkMZiER0gMDC0DddV4, address 8831 Cairo Ln. Category per Bizapedia/Cybo listings: 'Pool & Hot Tub Service' / 'Swimming Pool Cleaning and Maintenance' - no further service breakdown or stated service area was found anywhere. Owner name is INFERRED, not confirmed: Florida Sunbiz entity L22000102342 ('JAY'S POOL SERVICE LLC') lists 'FITZPATRICK, JEFFERY' as both Manager (an officer role, title MGR) and registered agent, at the same principal address as the business - i.e. he is not a third-party registered-agent-for-hire. A construction-labor directory independently lists a 'Jeffery Fitzpatrick, Port Richey, FL' doing pool-cage/aluminum work, and a 'Jeff Fitzpatrick' appears active in local Port Richey Facebook community groups, corroborating he is a real local pool-industry figure. However, the link between 'Jeffery' and the business's 'Jay' branding is an inference (common nickname pattern), not a direct confirmation - no review reply or bio explicitly states 'Jay = Jeffery.' IMPORTANT: extensive searching (Birdeye, Yelp, BBB, Nextdoor, Angi, Thumbtack, cybo, Google Maps) turned up no individually attributable Google review text for this specific business - only aggregate rating/count. A Facebook page under the identical business name was found and inspected in full, but its content (a 24' round liner replacement job 'in Lebanon, PA') confirmed it belongs to an unrelated Pennsylvania company of the same name, so it was excluded entirely rather than misattributed. No owner-uploaded photos exist as a result. Per instructions, reviews and photos are left empty rather than fabricated."
+}

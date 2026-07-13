@@ -1,0 +1,54 @@
+{
+  "name": "Sapphire Pool Service",
+  "slug": "sapphire-pool-service",
+  "phone": "(786) 233-9292",
+  "city": "Coral Gables/Miami, FL",
+  "owner_name": "Jose",
+  "owner_name_confidence": "confirmed",
+  "services": [
+    "Water testing & chemical analysis",
+    "Precision chemical balancing (chlorine, muriatic acid, stabilizer, etc.)",
+    "Filter cleaning",
+    "Basket & leaf catcher emptying",
+    "Surface brushing (walls, steps, tiles)",
+    "Surface netting/skimming",
+    "Full pool vacuuming",
+    "Equipment inspection (pumps, filters, valves, heaters)",
+    "Pump and filter lid lubrication",
+    "Water level monitoring",
+    "Pool equipment area cleanup",
+    "Weekend service (30% premium)",
+    "Emergency/same-day cleaning for parties, storms, or surprise visits",
+    "Twice-a-week cleaning for pools with heavy tree/pet debris",
+    "Saltwater and chlorine pool systems serviced"
+  ],
+  "service_area": [
+    "Coral Gables",
+    "Coconut Grove",
+    "Pinecrest",
+    "South Miami",
+    "West Miami"
+  ],
+  "reviews": [
+    {
+      "text": "Jose is outstanding and is in a league of his own. He is so professional, knowledgeable, and careful. The pool has never looked this good.",
+      "author": "Iva R."
+    },
+    {
+      "text": "Jose was amazing! He resolved my green pool situation in less than hour. Very courteous and professional. I definitely recommend Sapphire Pool Svs.",
+      "author": "Aymee S."
+    },
+    {
+      "text": "Jose is lovely! Punctual, respectful, fast, and effective. Was also able to accommodate last minute.",
+      "author": "Stephanie P."
+    }
+  ],
+  "photos": [
+    {
+      "url": "https://cdn.prod.website-files.com/645d18f2be3abf979b244fd9/69c80b2ec2a8e10e7b68065a_sapphire-pool-service-employee.avif",
+      "description": "Sapphire Pool Service technician photo used on the site's About Us page ('Our experience in Professional pool cleaning' section). Filename explicitly references the business, distinguishing it from the site's other stock/decorative graphics."
+    }
+  ],
+  "hours": null,
+  "source_notes": "Harvested via Nimble map/extract on sapphirepools.co (home, about-us, pricing, faq pages). Review quotes are real Google reviews embedded directly on-site (each links out to a share.google review URL). Owner first name 'Jose' is confirmed repeatedly across the site and reviews, including the About Us testimonial that reads '...and particularly the owner - Jose'; no last name is published anywhere on-site. Searched Florida Sunbiz for a matching active LLC/Inc under 'Sapphire Pool Service' at this address/phone and found no clean match, so the surname remains unconfirmed - do not guess it. No formal 'hours of operation' are posted; FAQ states scheduling is typically within 24-48 hours, weekend visits are available at a premium, and one review notes the owner personally answering an emergency call at 7 PM on a Saturday. The site's other imagery (repeated 'Pool Guy' background graphics) reads as template/stock art and was excluded as not clearly the business's own photography."
+}

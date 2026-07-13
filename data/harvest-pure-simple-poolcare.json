@@ -1,0 +1,70 @@
+{
+  "name": "Pure and Simple Poolcare LLC",
+  "slug": "pure-simple-poolcare",
+  "phone": "(407) 538-0284",
+  "city": "Orlando/Winter Park/Ocoee, FL",
+  "owner_name": "Joshua Hildebrand",
+  "owner_name_confidence": "confirmed",
+  "services": [
+    "Full-service pool cleaning (skimming, vacuuming, brushing)",
+    "Chemical balancing",
+    "Green-to-Clean algae treatment for neglected/green pools",
+    "Brush & Net service (for pools with automatic cleaners or screened enclosures)",
+    "Chemical-Only Plus (weekly water testing, chemical dosing, filter cleaning)",
+    "Full-service weekly maintenance (chemical balance, tile/wall brushing, skimming, professional Hammer-Head vacuum)",
+    "Equipment inspection, diagnosis, and repair"
+  ],
+  "service_area": [
+    "Orlando",
+    "Ocoee",
+    "Windermere",
+    "Winter Garden",
+    "Winter Park",
+    "Metro West",
+    "Gotha",
+    "Bay Hill",
+    "Dr. Phillips"
+  ],
+  "reviews": [
+    {
+      "text": "A reliable small business with a hard-working owner (Josh) who is very knowledgeable and will cater to all of your needs from pool-cleaning to diagnosing & fixing operational pool equipment issues.",
+      "author": "Mark Vatter"
+    },
+    {
+      "text": "I loved Pure and Simple Pool Care. As a new pool owner I had lots of question and Josh was patient and responsive... Highly recommend!!",
+      "author": "Donna Girard"
+    },
+    {
+      "text": "Joshua...was very kind to help me with my problems with my pool, over the phone, even though he didn't have to... I highly recommend him.",
+      "author": "Nene"
+    }
+  ],
+  "photos": [
+    {
+      "url": "https://pureandsimplepoolcare.com/wp-content/uploads/2025/06/d51f529f-171a-4c2c-99fc-b57aae5867b2.png",
+      "description": "Pure and Simple Pool Care's own logo, used site-wide on pureandsimplepoolcare.com."
+    },
+    {
+      "url": "https://pureandsimplepoolcare.com/wp-content/uploads/2025/10/pool-care-service-24.jpg.jpeg",
+      "description": "Light blue pickup truck parked outdoors with trees in background -- appears to be the company's own service truck; from the site's Gallery page."
+    },
+    {
+      "url": "https://pureandsimplepoolcare.com/wp-content/uploads/2025/10/pool-care-service-25.jpg.jpeg",
+      "description": "Blue and white pickup truck parked on a street -- a second angle of the company's own service truck; from the site's Gallery page."
+    },
+    {
+      "url": "https://pureandsimplepoolcare.com/wp-content/uploads/2025/10/pool-care-service-12.jpg.jpeg",
+      "description": "Technician (likely owner Joshua Hildebrand) cleaning a pond/water feature with a long pole near a waterfall; the same photo is featured on the About Us page under 'A Passion for Service.'"
+    },
+    {
+      "url": "https://pureandsimplepoolcare.com/wp-content/uploads/2025/10/pool-care-service-13.jpg.jpeg",
+      "description": "Image captioned 'Weekly pool maintenance team cleaning residential pool in Orlando, FL' on the site's Gallery page."
+    },
+    {
+      "url": "https://s3-media0.fl.yelpcdn.com/buphoto/Z54PxTR31CCrXQPuoAiG5g/90s.jpg",
+      "description": "Owner headshot photo of \"Joshua H.\" shown in the Business-Owner-Information section of the Pure and Simple Poolcare Yelp listing (Yelp listing status: Claimed/owner-managed)."
+    }
+  ],
+  "hours": "Mon-Sat 8:00 AM-5:00 PM, Sun Closed (per Yelp, Claimed/owner-managed listing)",
+  "source_notes": "A real standalone website was found at pureandsimplepoolcare.com (GoDaddy site), contradicting the brief's 'Birdeye profile only' assumption -- it directly confirms phone, owner (Joshua Hildebrand, 'in the business since 2008'), address (1712 Ison Ln, Ocoee, FL 34761), email (pureandsimplepoolcare@gmail.com), services, and 3 review pull-quotes under 'What Our Neighbors Are Saying' (styled like an embedded Google Reviews widget, not attributed to a platform on-page). Owner is independently confirmed via the Yelp listing's owner-info blurb ('Joshua H.', Claimed status) and a LinkedIn profile (linkedin.com/in/pureandsimplepoolcare, 'Owner at Pure and Simple Poolcare'). Service-area list merges two overlapping but non-identical self-statements: the website homepage ('Orlando, Ocoee, Windermere, Winter Garden, Winter Park, and Metro West') and the Yelp owner bio ('Windermere, Gotha, Metrowest, Ocoee, Winter Garden, Bay Hill, Dr. Phillips and surrounding areas'). A 4th website testimonial (Amanda Monday) was excluded -- it only showed Google review category tags (Responsiveness, Punctuality, etc.), not an actual quoted sentence. Facebook page (facebook.com/PureandSimplePoolcare, 184 likes, 2 check-ins) and an Instagram account were located but not scrapable (Facebook login wall). Most gallery images on the site are Getty stock photography (explicit 'GettyImages-*' filenames appear elsewhere on the same site) -- only the truck and technician-at-work photos listed here are judged likely to be the business's own."
+}

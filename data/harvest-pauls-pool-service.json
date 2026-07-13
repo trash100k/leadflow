@@ -1,0 +1,48 @@
+{
+  "name": "Paul's Pool Service, Inc.",
+  "slug": "pauls-pool-service",
+  "phone": "(407) 323-2141",
+  "city": "Lake Mary, FL",
+  "owner_name": "Paul S.",
+  "owner_name_confidence": "inferred",
+  "services": [
+    "Weekly pool maintenance / cleaning plans",
+    "Chemical balancing",
+    "Equipment repairs",
+    "Heater installation & repair",
+    "Salt chlorine generator repair & installation",
+    "Pool automation / remote control system repair & installation",
+    "Leak detection",
+    "Handrail installation",
+    "Automatic pool cleaner repair & installation",
+    "Pool resurfacing (exposed aggregate & pebble finishes)",
+    "Retiling (porcelain 6x6 tile)",
+    "Paver overlay systems & paver deck add-ons",
+    "Drain and acid wash services"
+  ],
+  "service_area": [
+    "Lake Mary, FL"
+  ],
+  "reviews": [
+    {
+      "text": "The weekly service keeps my pool looking great and the price is more than competitive.",
+      "author": "Nancy M."
+    },
+    {
+      "text": "I knew the pool pump had to be taken care of right away so I contact Paul's Pool Service Inc.",
+      "author": "Ken A."
+    },
+    {
+      "text": "Recent leak of the multiport valve noticed by our pool tech and reported to Brandy.",
+      "author": "Raymond S."
+    }
+  ],
+  "photos": [
+    {
+      "url": "https://s3-media0.fl.yelpcdn.com/buphoto/vNueT8b16slIyZXJvBE36Q/90s.jpg",
+      "description": "Owner headshot photo of \"Paul S.\" shown in the Business-Owner-Information section of the Paul's Pool Service Inc Yelp listing."
+    }
+  ],
+  "hours": "Mon-Thu 8:00 AM-5:00 PM, Fri 8:00 AM-3:30 PM, Sat-Sun Closed (per BBB profile; Yelp separately lists Mon-Thu 7:30 AM-4:30 PM / Fri 7:30 AM-3:30 PM, a minor discrepancy between the two directories)",
+  "source_notes": "Original brief assumed 'Facebook-only' but a real standalone website was found at paulspoolserviceinc.com (GoDaddy site) confirming the phone number and a 'family-owned, 30+ years' claim, though it has no services list, gallery, or reviews of its own. Full services list, years-in-business (34, since 1992), FL license #CPC055622, VP contact (Brandy Striano), and hours came from the BBB profile (bbb.org, A+ accredited since 2013) -- Brandy Striano's surname suggests the owner's likely full name is 'Paul Striano' but this is not directly stated anywhere, so owner_name is kept as the publicly-displayed 'Paul S.' Reviews are Yelp's 'Review Highlights' pull-quotes (listing status: Unclaimed, 4.7 stars / 13 reviews). The Facebook page (facebook.com/p/Pauls-Pool-Service-100063664865691, 214 likes, 7 check-ins) exists and was located, but Facebook's login wall blocked photo/post scraping. No explicit multi-city service-area claim was found in any owned source (BBB's 'View Service Area' is a map widget, not a text list) -- treated as Lake Mary-only. Yelp's 8 gallery photos (acid-wash before/after) were excluded because their first-person captions ('You can see where...') indicate they were customer-submitted with a review, not business-uploaded."
+}

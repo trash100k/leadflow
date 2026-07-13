@@ -1,0 +1,70 @@
+{
+  "name": "Ancient City Pools and Design",
+  "slug": "ancient-city-pools-and-design",
+  "phone": "(904) 856-7665",
+  "city": "St. Augustine, FL",
+  "owner_name": "Kyle Blakney",
+  "owner_name_confidence": "confirmed",
+  "services": [
+    "Custom swimming pool design (3D design consultation)",
+    "New pool construction/installation (concrete/gunite pools)",
+    "Hot tub and spa design and installation",
+    "Pool remodeling and renovation of existing pools",
+    "Permitting and HOA coordination",
+    "Pool decking, patios, and screened enclosures (via trade partners)",
+    "Pool maintenance service packages (available on request)",
+    "Financing assistance (HFS Financial, Lyon Financial)"
+  ],
+  "service_area": [
+    "St. Augustine",
+    "Crescent Beach",
+    "Vilano Beach",
+    "Ponte Vedra Beach",
+    "Ponte Vedra",
+    "Nocatee",
+    "Palencia",
+    "Greater St. Johns County"
+  ],
+  "reviews": [
+    {
+      "text": "Kyle and his team build a beautiful pool.",
+      "author": "Patrick McGee"
+    },
+    {
+      "text": "Great product, great price and the fastest pool builder around.",
+      "author": "Jason Lauer"
+    },
+    {
+      "text": "Our pool is absolutely beautiful and is exactly what we wanted!",
+      "author": "Olivia Murray"
+    }
+  ],
+  "photos": [
+    {
+      "url": "https://ancientcitypoolsanddesign.com/wp-content/uploads/2025/08/Ancient-City-Pools-Swimming-Pool-Design-Installation-St-Augustine-Florida-6-1.jpg",
+      "description": "Completed backyard pool build in St. Augustine, FL, shown in the homepage project gallery."
+    },
+    {
+      "url": "https://ancientcitypoolsanddesign.com/wp-content/uploads/2025/08/Ancient-City-Pools-Swimming-Pool-Design-Installation-St-Augustine-Florida-1-1.jpg",
+      "description": "Completed backyard pool build in St. Augustine, FL, shown in the homepage project gallery."
+    },
+    {
+      "url": "https://ancientcitypoolsanddesign.com/wp-content/uploads/2025/08/Contemporary-Waterfront-Pool-with-Sleek-Tile-Finish-in-Vilano-Beach-FL.jpg",
+      "description": "Contemporary waterfront pool with sleek tile finish, completed project in Vilano Beach, FL (Projects page gallery)."
+    },
+    {
+      "url": "https://ancientcitypoolsanddesign.com/wp-content/uploads/2025/08/Outdoor-Kitchen-and-Poolside-Entertainment-Area-by-Ancient-City-Pools-and-Design.jpg",
+      "description": "Completed outdoor kitchen and poolside entertainment area built by Ancient City Pools and Design (Projects page gallery)."
+    },
+    {
+      "url": "https://ancientcitypoolsanddesign.com/wp-content/uploads/2025/08/Kyle-1-min.png",
+      "description": "Headshot/photo of owner Kyle (Kyle Blakney), used site-wide under the \"Owner operated under Kyle\" byline."
+    },
+    {
+      "url": "https://ancientcitypoolsanddesign.com/wp-content/uploads/2023/08/Ancient-City-Pools-logo-2023.png",
+      "description": "Company logo used in the site header/footer."
+    }
+  ],
+  "hours": "Monday-Friday, 9:00 AM-5:00 PM (showroom/office; pool consultations by appointment)",
+  "source_notes": "All fields harvested directly from ancientcitypoolsanddesign.com (home, /about/, /our-process/, /faqs/, /reviews/, /projects/, /contact-us/) via Nimble extract on 2026-07-13. Business is a pool design/build/renovation contractor (not a weekly cleaning route service) per its own site content. Reviews are the 3 shortest, most quotable of ~20 real, named 5-star Google reviews embedded live on the site's Google-review widget (23 reviews total, 5.0 avg); full names used as they appear publicly on the review widget. Owner full name 'Kyle Blakney' confirmed via BBB Business Profile (bbb.org, lists 'Business Management: Mr. Kyle Blakney, President') and the business's own Instagram account, run under his name (@ancientcitypoolsanddesign). No explicit customer/reviewer photos were used, only photos from the business's own WordPress media library (home and Projects gallery)."
+}

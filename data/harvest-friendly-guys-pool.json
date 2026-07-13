@@ -1,0 +1,37 @@
+{
+  "name": "The Friendly Guys Pool Cleaners",
+  "slug": "friendly-guys-pool-cleaners",
+  "phone": "(904) 236-4443",
+  "city": "Ponte Vedra Beach, FL",
+  "owner_name": "Anthony Carey",
+  "owner_name_confidence": "confirmed",
+  "services": [
+    "Weekly pool cleaning (vacuuming, netting, brushing walls/steps/tiles)",
+    "Water testing and chemical balancing (pH, chlorine, alkalinity, calcium hardness, cyanuric acid, salt systems)",
+    "Skimmer and pump basket cleaning",
+    "Filter cleaning and backwashing (cartridge, sand, DE)",
+    "Pool equipment inspection and repairs/upgrades",
+    "Automatic pool cleaner (bag/filter) cleaning and verification",
+    "Algae treatment/removal, backed by a 'No Algae Guarantee'",
+    "Spa/hot tub cleaning (for pools with an attached spa)",
+    "Quarterly stabilizer (cyanuric acid) treatments",
+    "Two service tiers: All-Inclusive Plan (starting $159/month) and Standard Plan (starting $129/month)"
+  ],
+  "service_area": [
+    "Ponte Vedra Beach",
+    "Jacksonville",
+    "Ponte Vedra / Palm Valley / Sawgrass",
+    "Nocatee",
+    "St. Augustine",
+    "Vilano Beach",
+    "Jacksonville Beach",
+    "Atlantic Beach",
+    "Neptune Beach",
+    "Fleming Island",
+    "Orange Park"
+  ],
+  "reviews": [],
+  "photos": [],
+  "hours": null,
+  "source_notes": "Services and pricing pulled directly from pontevedrabeachpoolguys.com (home, /full-service-plan-pool-cleaning.cfm, /partial-service-plan-pool-cleaning.cfm, /satisfaction-guarantee.cfm) via Nimble extract on 2026-07-13. Owner name confirmed via the business's own LinkedIn company page (linkedin.com/company/the-friendly-guys-pool-cleaners-ponte-vedra-beach), which self-identifies: 'Hey! I'm Anthony Carey, the owner of The Friendly Guys Pool Cleaners' -- matches and confirms the candidate name given. Service area: the primary website itself only claims 'Ponte Vedra Beach & Jacksonville' with weekly routes in zip codes 32082/32081 'and many adjacent areas'; the LinkedIn About section lists a much longer (~45-city) North Florida list that reads like a generic SEO template -- an identical site template/structure was found live under different city branding at fortmyerspoolguys.com and lithiapoolservice.com, so that long list is treated as lower-confidence boilerplate and only its most plausible/local entries are included above. REVIEWS: no real, attributable review text could be recovered -- the website itself embeds no review widget/testimonials, Zillow profile shows 0 reviews, Houzz profile blocked by bot-protection, and BBB/web search turned up no named quotes; a location search did surface an aggregate GBP rating of 4.9 stars over 14 reviews, but no underlying review text/names were accessible via available tools, so none are reported here rather than fabricating any. PHOTOS: no genuine owner-uploaded photos (truck, team, completed pool) were found -- the only images on-site are generic template graphics/product-brand logos (Pentair, Hayward, Polaris, Jandy), a coverage-area map graphic, and stock-style plan illustrations shared verbatim across the same-template sister sites noted above, so none are reported here as authentic business photos. Recommend a fallback (e.g. logo-only or a professionally shot photo) rather than using any image from this site."
+}

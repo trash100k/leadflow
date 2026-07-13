@@ -1,0 +1,41 @@
+{
+  "name": "Golden Pool & Spa Services",
+  "slug": "golden-pool-spa",
+  "phone": "(754) 302-5713",
+  "city": "Lauderhill/Fort Lauderdale, FL",
+  "owner_name": "Thiago Silva Dourado",
+  "owner_name_confidence": "confirmed",
+  "services": [
+    "Weekly pool cleaning & maintenance service",
+    "Deep cleaning",
+    "General maintenance",
+    "Chemical maintenance / pH balancing",
+    "Filtration systems service",
+    "Leak repair",
+    "Real-time digital service reports",
+    "Pool heater installation",
+    "Spa/hot tub cleaning, maintenance & repair",
+    "Residential, commercial & Airbnb pool service"
+  ],
+  "service_area": [
+    "Broward County",
+    "Palm Beach County"
+  ],
+  "reviews": [
+    {
+      "text": "William and his team are professional, knowledgeable and reliable. They have been doing the weekly maintenance of my pool for a year and it always looks beautiful, sparkling and clean. This is the best pool service we have had and I recommend them highly.",
+      "author": "Kriss"
+    },
+    {
+      "text": "Thiago & William know what they are doing. They were the only ones who could diagnose the problem and fix it!! They are honest, smart and professional!",
+      "author": "Sha K."
+    },
+    {
+      "text": "Five star service all around. Attention to detail like no other company I've ever used. They take pride in there work and it shows.",
+      "author": "Paul Chips"
+    }
+  ],
+  "photos": [],
+  "hours": "Mon-Fri 7:30 AM-6:00 PM; Sat 7:30 AM-12:30 PM; Sun Closed (per the 'Service Hours' section of goldenpoolandspaservices.com, matched by the Birdeye-listed hours for the Palm Beach location). Note: the same site's footer separately states a generic 'Mon - Sat : 9:00AM - 6:00 PM', which conflicts slightly with the detailed schedule above.",
+  "source_notes": "Services and hours harvested from goldenpoolandspaservices.com homepage via Nimble extract; the site markets itself broadly as serving 'Broward and Palm Beach' counties (with separate phone lines for each area) rather than naming individual cities. Owner's full name confirmed via the Florida Sunbiz LLC filing for GOLDEN POOL & SPA SERVICES LLC, which lists two Authorized Persons/Managers: 'DOURADO, THIAGO SILVA' (at the company's own principal address, 1141 NW 41st Ln, Lauderhill) and 'DOURADO, WILLIAM'; this matches the 'Thiago Dourado' background-check credential shown on the company's Thumbtack profile. William Dourado (likely a relative/co-owner) appears at least as frequently as Thiago in customer reviews and may be a co-operator of the business day to day - flagging this so outreach material doesn't over-index on Thiago alone. Reviews were sourced from Birdeye (which syndicates the business's real Google reviews - Kriss and Paul Chips) and Thumbtack (verified 'Hired on Thumbtack' review from Sha K. that explicitly names Thiago). Could not find any photo on the company's own website that is clearly their own: goldenpoolandspaservices.com's imagery uses stock photography (filenames matching Adobe Stock '360_F_' and Freepik numeric-ID conventions); their Instagram (@goldenpoolandspa) likely has real jobsite photos but was not retrievable through available tools. Recommend falling back to stock/generic pool imagery or requesting photos directly from the business rather than fabricating attribution."
+}
