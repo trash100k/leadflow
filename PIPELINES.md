@@ -17,6 +17,20 @@ REST API, not the MCP connector.
 
 ---
 
+## 0. The four operating workflows (skills — call these)
+
+| Skill | What it does | Cadence |
+|---|---|---|
+| **`/has-site-cards`** | Businesses WITH sites → graded report card → auto-email (inbox rotation) or CALL queue | callable · schedulable |
+| **`/no-site-builder`** | Businesses WITHOUT sites → GBP harvest → **build them a live site** (`front-end-design` skill) + mini card → outreach | callable |
+| **`/mega-flow`** | **THE daily job** — one sweep, router runs both tracks, 50/day, auto-expands metros, first-10 gate per new ICP | daily cron |
+| **`/state-exclusive`** | Flagship vertical template, rebranded demo per prospect, **website sold once per state** (registry-enforced) | per state |
+
+Every workflow includes the **GBP harvest**: photos (owner-uploaded only),
+review pull-quotes/good press, hours, services, owner names — feeding both the
+report cards and the site builds. `/report-card <url>` remains the one-off
+fast path. Kickoff format: `<vertical> | <metro or state> | [target] | [overrides]`.
+
 ## 1. What worked / what failed (session ledger — binding)
 
 ### Keep (proven here)
