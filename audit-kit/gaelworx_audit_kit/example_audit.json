@@ -1,0 +1,75 @@
+{
+  "meta": { "ref": "RHL-72703-0626", "date": "26 Jun 2026" },
+  "business": { "name": "Rolling Hills Landscaping", "url": "rollinghiillslandscapingllc.com" },
+  "scores": {
+    "design": 6, "mobile": 6, "tech_seo": 4, "local_seo": 3, "content_eeat": 5,
+    "aeo": 2, "geo": 2, "agentic": 3, "accessibility": 5, "cro": 4
+  },
+  "flags": ["AGENT-BLIND", "AI-INVISIBLE", "NO-LOCAL"],
+  "working": [
+    { "title": "Modern build, real imagery.", "detail": "A current page-builder template with genuine project photos — already ahead of most trade sites in the area. (Design 6)" },
+    { "title": "Service architecture is clean.", "detail": "Eight service categories each get their own tile — a clear map for both visitors and search crawlers." },
+    { "title": "Responsive foundation intact.", "detail": "The template handles phone widths correctly; the mobile floor is solid. (Mobile 6)" }
+  ],
+  "costing": [
+    { "title": "Name misspelled on the page.", "detail": "The headline reads \"Rolling Hills Lanscaping\"; the browser tab shows \"rolling hills landscpape.\" First thing humans and Google read. (Tech SEO 4)" },
+    { "title": "Typo baked into the domain.", "detail": "A doubled \"i,\" and the canonical tag points to a different spelling — traffic and ranking signal both leak." },
+    { "title": "No phone on the homepage.", "detail": "Every path routes to a form; no tap-to-call for emergency intent. (CRO 4)" },
+    { "title": "Dead footer links.", "detail": "Contact, Support, T&C and Privacy all point to \"#\" — nowhere." }
+  ],
+  "ai_blind_spot": {
+    "paragraphs": [
+      "When a homeowner asks an AI assistant — ChatGPT, Gemini, Google's AI overview — <b>\"who does drainage work near Fayetteville?\"</b>, your site gives the model almost nothing it can quote back. There's no FAQ schema, no answer-shaped paragraphs, and no structured entity data describing who you are and where you work.",
+      "The content reads as marketing prose, not extractable answers. So generative engines skip past you in favour of competitors whose pages are structured for retrieval. As more searches start inside an AI assistant instead of a list of blue links, <b>this is the gap that quietly removes you from the conversation.</b>"
+    ],
+    "probe": [
+      { "label": "FAQ / QAPage schema", "status": "ABSENT" },
+      { "label": "Answer paragraphs (40-60 words)", "status": "ABSENT" },
+      { "label": "Entity / Organization JSON-LD", "status": "ABSENT" },
+      { "label": "Service-area structured data", "status": "ABSENT" }
+    ]
+  },
+  "agentic": {
+    "paragraphs": [
+      "A growing share of bookings will soon be made by AI agents acting on a customer's behalf — pulling your phone number, service area and hours automatically. We probed whether your site exposes that information in a machine-readable way:",
+      "As written, an AI booking agent would <b>fail to extract a phone number or service area</b> from this page and move on to a competitor it can read. This is a door that's still open today and closing fast."
+    ],
+    "probe": [
+      { "label": "Semantic HTML5 landmarks", "status": "PARTIAL", "note": "builder divs; few section/nav roles" },
+      { "label": "robots.txt bot permissions", "status": "UNVERIFIED" },
+      { "label": "llms.txt", "status": "ABSENT" },
+      { "label": "Machine-readable NAP", "status": "ABSENT", "note": "name / address / phone not structured" },
+      { "label": "Tap-to-call & mailto hooks", "status": "ABSENT" }
+    ]
+  },
+  "local": {
+    "rating": "5.0", "reviews": 38, "competitor_count": "20+", "map_rank": "#?",
+    "paragraphs": [
+      "You hold a flawless <b>5.0 rating across 38 reviews</b> — stronger social proof than most competitors in Northwest Arkansas. Yet the misspelled name, the typo'd domain and the missing local schema mean that reputation is effectively <b>invisible at the exact moment someone searches.</b>",
+      "Reviewers repeatedly single out your responsiveness — one noted you were <b>\"only 2 of 5 companies that even called me back.\"</b> That reliability is your sharpest competitive edge, and right now it appears nowhere on the site itself."
+    ]
+  },
+  "competitors": [
+    { "name": "Rolling Hills", "rating": "5.0", "reviews": 38, "mobile_call": "no", "schema": "no", "name_domain": "typo", "overall": "D+", "you": true },
+    { "name": "Fay-Ark Lawn Co.", "rating": "4.9", "reviews": 302, "mobile_call": "yes", "schema": "partial", "name_domain": "ok", "overall": "B-", "you": false },
+    { "name": "Willow St. Lawns", "rating": "4.8", "reviews": 155, "mobile_call": "partial", "schema": "no", "name_domain": "ok", "overall": "C+", "you": false },
+    { "name": "A Clean Cut Lawn Care", "rating": "4.2", "reviews": 157, "mobile_call": "no", "schema": "no", "name_domain": "ok", "overall": "C-", "you": false }
+  ],
+  "accessibility": {
+    "probe": [
+      { "label": "Image alt text", "status": "SPARSE", "note": "decorative builder images unlabeled" },
+      { "label": "ARIA landmark roles", "status": "MINIMAL" },
+      { "label": "Colour-contrast (text vs bg)", "status": "ADEQUATE" },
+      { "label": "Privacy policy", "status": "DEAD LINK", "note": "footer points to \"#\"" },
+      { "label": "Cookie consent notice", "status": "ABSENT" }
+    ],
+    "note": "The dead privacy-policy link is the priority fix — it's a one-line correction that removes a compliance flag and a broken-link ranking penalty at the same time."
+  },
+  "plan": [
+    { "week": "Week 1", "title": "Stop the bleeding", "detail": "Fix the misspelled name & tab title, add a tap-to-call number, repair the dead footer links.", "phase": "near" },
+    { "week": "Week 2", "title": "Fix the foundation", "detail": "Correct the domain canonical and resolve the typo so search traffic stops leaking.", "phase": "near" },
+    { "week": "Week 3", "title": "Open the AI door", "detail": "Add FAQ & Organization schema and structured NAP so assistants and Google can quote you.", "phase": "later" },
+    { "week": "Week 4", "title": "Convert the win", "detail": "Surface your 5.0 reviews on the homepage and add a sticky mobile call bar.", "phase": "later" }
+  ],
+  "bottom_line": "Rolling Hills has the reputation and the visuals of a market leader, sitting on a website that misspells its own name and hides its phone number. The single highest-leverage move is correcting the name and domain signal and adding structured, tap-to-call contact data — turning a 5-star reputation that is currently invisible to Google and AI assistants into recovered, trackable inbound calls."
+}

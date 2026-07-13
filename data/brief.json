@@ -1,0 +1,13 @@
+{
+  "sender_name":        "Zach",
+  "sender_title":       "Founder",
+  "sender_email":       "zach@gaelworx.com",
+  "sender_phone":       "(369) 212-1203",
+  "cta_mailto":         "zach@gaelworx.com",
+  "cta_subject":        "Send me my report card",
+  "cta_label":          "Get my free report card",
+  "unsubscribe_mailto": "zach@gaelworx.com",
+  "mode":               "draft",
+  "industry":           "solar installer",
+  "geo":                "Southeast US"
+}

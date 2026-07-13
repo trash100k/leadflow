@@ -1,0 +1,10 @@
+node_modules/
+out/
+*.pdf
+.DS_Store
+.env
+data/leads.jsonl
+*.pyc
+__pycache__/
+webapp/public/assets.js
+webapp/public/reportCardTemplate.js

@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GAELWORX Site Audit — data contract",
+  "description": "The agent fills ONE object of this shape per lead, then passes it to render_report.py. Every field maps to a slot in the report template. Do not invent data; where a value was not observed, use the documented null/placeholder behavior described per field.",
+  "type": "object",
+  "required": ["meta", "business", "scores", "flags", "working", "costing", "ai_blind_spot", "agentic", "local", "competitors", "accessibility", "plan", "bottom_line"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["ref", "date"],
+      "properties": {
+        "ref": {"type": "string", "description": "Unique doc ref, e.g. slug+zip+date: 'RHL-72703-0626'. Generate from business slug + zip + MMDD."},
+        "date": {"type": "string", "description": "Human date e.g. '26 Jun 2026'."}
+      }
+    },
+    "business": {
+      "type": "object",
+      "required": ["name", "url"],
+      "properties": {
+        "name": {"type": "string", "description": "Exact business name as it should appear in the header."},
+        "url": {"type": "string", "description": "Bare domain, no scheme, e.g. 'example.com'."}
+      }
+    },
+    "scores": {
+      "type": "object",
+      "description": "Integer 1-10 for each of the 10 dimensions. The 4 VERIFIED ones (design,mobile,tech_seo,cro) MUST come from direct observation. The 6 INFERRED ones are reasoned estimates and feed only the bar grid, never the radar.",
+      "required": ["design","mobile","tech_seo","local_seo","content_eeat","aeo","geo","agentic","accessibility","cro"],
+      "properties": {
+        "design": {"type": "integer", "minimum": 1, "maximum": 10},
+        "mobile": {"type": "integer", "minimum": 1, "maximum": 10},
+        "tech_seo": {"type": "integer", "minimum": 1, "maximum": 10},
+        "local_seo": {"type": "integer", "minimum": 1, "maximum": 10},
+        "content_eeat": {"type": "integer", "minimum": 1, "maximum": 10},
+        "aeo": {"type": "integer", "minimum": 1, "maximum": 10},
+        "geo": {"type": "integer", "minimum": 1, "maximum": 10},
+        "agentic": {"type": "integer", "minimum": 1, "maximum": 10},
+        "accessibility": {"type": "integer", "minimum": 1, "maximum": 10},
+        "cro": {"type": "integer", "minimum": 1, "maximum": 10}
+      }
+    },
+    "flags": {
+      "type": "array",
+      "description": "Subset of allowed flags that are currently TRUE for this site. Renderer lights them. Allowed: AGENT-BLIND (agentic<=3), AI-INVISIBLE (aeo+geo<=5), A11Y-RISK (accessibility<=4), NO-LOCAL (local_seo<=3).",
+      "items": {"type": "string", "enum": ["AGENT-BLIND", "AI-INVISIBLE", "A11Y-RISK", "NO-LOCAL"]}
+    },
+    "working": {
+      "type": "array",
+      "description": "2-3 strengths actually observed. Each: a bolded lead phrase + sentence of evidence.",
+      "items": {"type": "object", "required": ["title","detail"], "properties": {"title": {"type": "string"}, "detail": {"type": "string"}}}
+    },
+    "costing": {
+      "type": "array",
+      "description": "3-4 highest-impact observed problems, most valuable first.",
+      "items": {"type": "object", "required": ["title","detail"], "properties": {"title": {"type": "string"}, "detail": {"type": "string"}}}
+    },
+    "ai_blind_spot": {
+      "type": "object",
+      "required": ["paragraphs", "probe"],
+      "properties": {
+        "paragraphs": {"type": "array", "items": {"type": "string"}, "description": "1-2 short paragraphs. Reference a real local-intent query for this trade/area."},
+        "probe": {"type": "array", "description": "4 machine-readiness checks.", "items": {"type": "object", "required": ["label","status"], "properties": {"label": {"type": "string"}, "status": {"type": "string", "enum": ["PRESENT","ABSENT","PARTIAL","UNVERIFIED"]}, "note": {"type": "string"}}}}
+      }
+    },
+    "agentic": {
+      "type": "object",
+      "required": ["paragraphs", "probe"],
+      "properties": {
+        "paragraphs": {"type": "array", "items": {"type": "string"}},
+        "probe": {"type": "array", "items": {"type": "object", "required": ["label","status"], "properties": {"label": {"type": "string"}, "status": {"type": "string", "enum": ["PRESENT","ABSENT","PARTIAL","UNVERIFIED"]}, "note": {"type": "string"}}}}
+      }
+    },
+    "local": {
+      "type": "object",
+      "required": ["rating", "reviews", "competitor_count", "map_rank", "paragraphs"],
+      "properties": {
+        "rating": {"type": "string", "description": "e.g. '5.0' — from Google Business Profile (real data)."},
+        "reviews": {"type": "integer", "description": "Review count (real data)."},
+        "competitor_count": {"type": "string", "description": "e.g. '20+'."},
+        "map_rank": {"type": "string", "description": "Map-pack rank if known, else '#?'."},
+        "paragraphs": {"type": "array", "items": {"type": "string"}, "description": "The reputation-vs-visibility disconnect, citing a real review quote if one was found."}
+      }
+    },
+    "competitors": {
+      "type": "array",
+      "description": "Up to 4 rows INCLUDING the target (mark target with you:true). rating/reviews are REAL. mobile_call/schema/overall are illustrative unless the competitor site was actually audited.",
+      "items": {"type": "object", "required": ["name","rating","reviews","mobile_call","schema","name_domain","overall","you"], "properties": {
+        "name": {"type": "string"},
+        "rating": {"type": "string"},
+        "reviews": {"type": "integer"},
+        "mobile_call": {"type": "string", "enum": ["yes","no","partial"]},
+        "schema": {"type": "string", "enum": ["yes","no","partial"]},
+        "name_domain": {"type": "string", "description": "'ok' or a short flag like 'typo'."},
+        "overall": {"type": "string", "description": "Letter grade e.g. 'D+'."},
+        "you": {"type": "boolean"}
+      }}
+    },
+    "accessibility": {
+      "type": "object",
+      "description": "Only rendered when scores.accessibility <= 6. probe items + a priority sentence.",
+      "required": ["probe", "note"],
+      "properties": {
+        "probe": {"type": "array", "items": {"type": "object", "required": ["label","status"], "properties": {"label": {"type": "string"}, "status": {"type": "string", "enum": ["ADEQUATE","SPARSE","MINIMAL","ABSENT","DEAD LINK"]}, "note": {"type": "string"}}}},
+        "note": {"type": "string"}
+      }
+    },
+    "plan": {
+      "type": "array",
+      "description": "Exactly 4 timeline steps (Weeks 1-4). First two are 'near' (orange dots), last two 'later' (grey).",
+      "items": {"type": "object", "required": ["week","title","detail","phase"], "properties": {"week": {"type": "string"}, "title": {"type": "string"}, "detail": {"type": "string"}, "phase": {"type": "string", "enum": ["near","later"]}}}
+    },
+    "bottom_line": {"type": "string", "description": "Exactly 3 sentences: current state -> biggest single opportunity -> revenue impact. The only deeper-reasoning field."}
+  }
+}

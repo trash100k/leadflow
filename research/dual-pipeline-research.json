@@ -1,0 +1,719 @@
+{
+ "v2:e6720896cc3315c36dbf2ed9df0ef8a41e9aefa4d86b1206646e43263c856241": {
+  "summary": "For GBP-only businesses, third-party scrapers (Outscraper, Apify's compass/crawler-google-places, SerpAPI, DataForSEO) extract essentially the full public profile \u2014 hours, category/attributes (\"about\"), photo URLs with author attribution and counts, full review text with owner replies, Q&A, owner posts/updates, booking/reservation/order links, popular times, and claimed/unclaimed status \u2014 at $1-5 per 1,000 places, versus the official Places API which is field-mask-tiered ($17-40/1k) plus $7/1k for photos and contractually bans storing/reusing the data. Email and owner-name discovery for no-website businesses is a layered manual/semi-automated stack: Facebook Page About sections (the #1 email source when there's no site), Florida Sunbiz officer/registered-agent lookups for the legal owner name, GBP review-reply signatures, BBB principal listings, and (rarely, due to GDPR redaction) whois/RDAP. Legally, scraping GBP violates Google's ToS (a contract/blocking risk, which is why practitioners route through third-party scrapers), and owner-uploaded GBP photos remain the business's own copyright \u2014 Google only holds a license \u2014 so reusing \"By owner\" photos in a private spec site built FOR that business is low-risk if you exclude customer-uploaded photos, keep the draft unindexed/watermarked, and honor takedown; never reuse Street View or other Google-owned imagery.",
+  "tactics": [
+   {
+    "tactic": "Scrape the full GBP record with a third-party scraper, not the official API \u2014 nearly every profile surface is obtainable",
+    "evidence": "Outscraper's Google Maps Scraper returns 120+ fields including working_hours, subtypes/category, description, 'about' attribute groups (accessibility, amenities, service options), photos_count, main photo URL, street_view URL, posts, reviews_tags, reviews_per_score, popular_times, reservation_links, booking_appointment_link, menu_link, order_links, owner_id and verified (claimed) status. Apify's Google Places actor sample output additionally shows questionsAndAnswers, ownerUpdates, bookingLinks, reserveTableUrl, imageCategories (including a 'By owner' bucket), per-image authorName/authorUrl/uploadedAt, reviewsDistribution, and claimThisBusiness (unclaimed flag).",
+    "source": "https://outscraper.com/google-maps-api/"
+   },
+   {
+    "tactic": "Use SerpAPI's Google Maps Place Results engine when you need per-place JSON including booking links and owner posts",
+    "evidence": "SerpAPI's place_results object contains title, rating, reviews, booking_link, hours, extensions (highlights/accessibility/payments), images with photos_link to a dedicated Photos API, user_reviews, service_options, order_online, and an 'unclaimed_listing: true' flag for unclaimed profiles. Its Local Posts ('From the owner') extraction returns each post's media, CTA type ('Book', 'Order online', 'Call now'), link, description, and date, with a serpapi_posts_link to a full Posts API; a separate Google Maps Reviews API returns full review text, owner responses, reviewer metadata and topic filters.",
+    "source": "https://serpapi.com/maps-place-results"
+   },
+   {
+    "tactic": "Use DataForSEO Business Data API for structured GBP Q&A, owner posts, and reviews at task-based pricing",
+    "evidence": "DataForSEO's Google Business Data API has dedicated endpoints: My Business Info (title, description, service categories, available/unavailable attributes, phone, domain, work time, busy hours), My Business Updates (owner posts: text, post URL, image URL, author, date, link anchors), Google Reviews, and a Questions & Answers endpoint that returns full question/answer text plus timestamps and user info, billed per 20 questions (example task cost shown: $0.00075).",
+    "source": "https://dataforseo.com/apis/business-data-api/google-my-business"
+   },
+   {
+    "tactic": "Budget scraping at $1-5 per 1,000 places; add detail-page and review add-ons only where needed",
+    "evidence": "Apify compass/crawler-google-places bills $5/1k places on Free, $4 on Starter ($29/mo), $3 on Scale, $2.10 on Business, with a scrapePlaceDetailPage add-on at $0.002/place required for review counts and richer fields; its Reviews Scraper is $0.30/1k reviews. Outscraper is free up to 500 places/month, then $3/1k places (to 100k) and $1/1k after; reviews are $3/1k and the Photos Scraper has a free tier before 500 images. Cheaper clones (e.g. microworlds) advertise $1-1.50/1k places with emails.",
+    "source": "https://use-apify.com/docs/best-apify-actors/best-google-maps-scrapers"
+   },
+   {
+    "tactic": "Filter the scrape to your wedge: no-website + unclaimed listings",
+    "evidence": "Outscraper's advanced filters explicitly support returning only 'businesses without a website' (and without phone, keyword-in-name, etc.), and its enrichment flow adds 'ignore without emails' / 'drop email duplicates' options; SerpAPI exposes unclaimed_listing:true and Apify exposes claimThisBusiness \u2014 an unclaimed, website-less GBP is the highest-intent prospect for a spec-site offer.",
+    "source": "https://outscraper.com/enrichment-services/"
+   },
+   {
+    "tactic": "Get photos via scraper-returned googleusercontent URLs; know the official alternative costs $7/1k photo requests",
+    "evidence": "Scrapers return direct lh*.googleusercontent.com photo URLs (resizable via the =w1920-h1080 URL suffix) plus photos_count and per-image author attribution at no extra per-photo API fee; the official Place Photos (New) SKU is Enterprise category, billed per successful photo request at $7.00/1k (0-100K tier, dropping to $5.60/$4.20 at volume) with only ~1,000 free Enterprise-tier calls/month since Google replaced the $200 credit with per-SKU caps in March 2025.",
+    "source": "https://apio.sh/apis/google-places"
+   },
+   {
+    "tactic": "On the official Places API, watch field-mask SKU tiering \u2014 photos/hours/reviews silently reprice every call",
+    "evidence": "Places API (New) bills at the highest tier of any requested field: Essentials (IDs, $5/1k Place Details), Pro ($17/1k, adds displayName/address/photos metadata), Enterprise ($20/1k, adds rating, opening hours, phone, website), Enterprise+Atmosphere ($40/1k Text Search tier, adds reviews and attributes). Text Search Pro is $32/1k after 5,000 free calls/month. 'One stray rating in a field mask moves an entire endpoint from Pro to Enterprise.'",
+    "source": "https://goodenoughmaps.com/blog/google-places-api-pricing"
+   },
+   {
+    "tactic": "EMAIL: accept that GBP never exposes an email \u2014 enrichment tools bridge via the linked website, so for no-website businesses go to Facebook",
+    "evidence": "CazaLead: 'Google deliberately omits email addresses from Maps listings\u2026 the workaround is the listing links to the business's website; the email is on that website' \u2014 Outscraper's Emails & Contacts enrichment works the same way (crawls the site, returns email_1-3, phone_1-3, Facebook/Instagram/LinkedIn links, plus optional SMTP email validation). For businesses with NO site this returns nothing, and CazaLead's match-rate table flags 'sole trader or micro-business \u2014 often no website or just a Facebook page' as the low-match case \u2014 meaning the Facebook page IS the fallback source.",
+    "source": "https://cazalead.com/blog/how-to-extract-emails-from-google-maps"
+   },
+   {
+    "tactic": "EMAIL: pull the Facebook Page About \u2192 Contact and Basic Info section (manually or via bulk scrapers)",
+    "evidence": "EmailSneak documents the exact flow: Page \u2192 About \u2192 'Contact and basic info' lists email/phone/website when the owner published one; if absent, follow the Page's website link to the footer/contact page; verify via SMTP before sending because Pages can be years stale. Bulk options exist: Apify's Facebook B2B Email Scraper scans Page About sections and posts by keyword+location ('Plumbers in Chicago') and returns verified-format emails; Outscraper's GBP enrichment also returns the Facebook page URL to feed this step.",
+    "source": "https://emailsneak.com/facebook-email-extractor"
+   },
+   {
+    "tactic": "OWNER NAME: read GBP review-reply signatures \u2014 service-business owners sign their own replies",
+    "evidence": "LocalProspects: 'Business owners who respond to Google reviews often sign their responses with their name\u2026 \"Thank you for the kind words! - Jerry\" / \"- Jerry Reid, Owner\"\u2026 surprisingly effective for service businesses (plumbers, contractors, dentists) because owners of these businesses tend to manage their own Google listings and respond personally.' Scraper review objects include responseFromOwnerText/response snippets, so this can be automated with a regex/LLM pass over owner responses.",
+    "source": "https://localprospects.ai/articles/how-to-find-local-business-owner-names"
+   },
+   {
+    "tactic": "OWNER NAME (Florida): Sunbiz entity search \u2192 Officer/Director Detail gives the legal owner with 100% accuracy",
+    "evidence": "Florida's Division of Corporations search (search.sunbiz.org) supports search by Entity Name, by Officer or Registered Agent name, by Zip Code and by Street Address; the record detail shows 'Officer/Director Detail: names, addresses, and titles of the current officers/directors/managers' and Registered Agent name/address. Partial names are acceptable ('Doe, J'). In an LLC 'a member is the equivalent of an owner.' GMapsScraper's method comparison rates Secretary of State lookups 'Yes (managing member)' for owner name \u2014 the most authoritative source, though it yields no email/phone.",
+    "source": "https://dos.fl.gov/sunbiz/search/guides/corporation-records/"
+   },
+   {
+    "tactic": "OWNER NAME: layered fallback stack \u2014 BBB principal \u2192 Facebook page sweep \u2192 Google query operators; expect ~70% fill",
+    "evidence": "LocalProspects' production pipeline: BBB business-management section first (fast, accurate 'when it hits', misses ~53%), then LLM extraction over website/About/footer text, hitting 'about a 70% fill rate' combined. GMapsScraper's 'Facebook page sweep': on tiny pages (1-3 likes/post) the person consistently liking/commenting is almost always the owner's personal account, and 'many owners listed their name when they set up the page' in About. Also query operators: \"Company Name\" + owner/founded by/managing member surfaces local news and chamber features.",
+    "source": "https://gmapsscraper.io/blog/find-business-owner-contact-info"
+   },
+   {
+    "tactic": "EMAIL/OWNER: whois \u2192 RDAP lookup on any domain the business registered (works only occasionally post-GDPR)",
+    "evidence": "GrowLeads documents the classic flow (WHOIS.com / WhoisXMLAPI \u2192 'Registrant Email' / 'Admin Email', 'especially for small companies where owners register domains themselves'), but Apify's RDAP actor FAQ states the current reality: 'Post-GDPR, most public RDAP responses redact registrant contact details' \u2014 you typically get only registrar and abuse contacts. Treat whois as a bonus check for older .com domains and parked domains, not a primary source.",
+    "source": "https://growleads.io/blog/find-any-business-owners-email-quick-simple-b2b-guide/"
+   },
+   {
+    "tactic": "LEGAL/ToS: know that all GBP scraping breaches Google's terms \u2014 the risk is contractual (blocking/termination), which is why practitioners buy it from third-party scrapers",
+    "evidence": "Google Maps Platform ToS 3.2.3(a) 'No Scraping': customers may not 'copy and save business names, addresses, or user reviews' or pre-fetch/cache/rehost Maps content; consumer Maps Additional Terms prohibit 'mass download or bulk feeds' and using Maps 'to create or augment any other mapping-related dataset (including a business listings database, mailing list, or telemarketing list)'. Places API policies add that persisting Place Names outside a session 'constitutes scraping' and require author attribution on any displayed photos/reviews. None of this is criminal law \u2014 it's a ToS/contract issue \u2014 but it means data pulled via your own Google Cloud key is the riskiest path; commercial scrapers assume the scraping risk themselves.",
+    "source": "https://cloud.google.com/archive/maps-platform/terms-20250604"
+   },
+   {
+    "tactic": "PHOTOS/COPYRIGHT: reuse only 'By owner' GBP photos in the spec site \u2014 the business, not Google, owns them",
+    "evidence": "GBP Additional Terms: the business grants Google a license to basic profile info, and 'all other content that you provide to your Business Profile (such as business photos) is licensed to Google under the Google Terms of Service' \u2014 i.e., the uploader retains copyright; Google merely holds a license. So owner-uploaded photos are the prospect's own IP: using them in a private, unlisted spec site built FOR that prospect is unauthorized-but-rights-holder-is-the-recipient (low practical risk; get their sign-off before going live, honor immediate takedown). Customer/reviewer-uploaded photos belong to those individuals \u2014 exclude them; Apify's imageCategories ('By owner' bucket) and per-image authorName let you filter programmatically. Google's Geo Guidelines separately require attribution for any Google-owned imagery and prohibit screenshotting Street View \u2014 don't pull hero images from Street View.",
+    "source": "https://support.google.com/business/answer/9292476?hl=en-GB"
+   },
+   {
+    "tactic": "OUTREACH COMPLIANCE + personalization: B2B cold email to scraped GBP leads is CAN-SPAM-legal; reference listing specifics",
+    "evidence": "GMapsScraper's workflow guide: B2B cold email is legal in the US under CAN-SPAM (physical address, unsubscribe, honor opt-outs within 10 days); emails extracted from publicly accessible pages. Their template for no-website businesses ('I was looking at {{business_name}} on Google Maps and noticed you don't have a website\u2026') reportedly converts at 5-10% reply rates, and web-design pitches to no/bad-website businesses at 7-9%, because personalization pulls directly from listing data (rating, review count, missing photos/hours).",
+    "source": "https://gmapsscraper.io/blog/cold-email-google-maps-leads-workflow"
+   }
+  ],
+  "pitfalls": [
+   "Official Places API is the wrong tool for this: field masks silently upgrade SKUs (one 'rating' field moves a call from $32 to $35/1k; reviews push $40/1k), photos cost $7/1k extra requests, results cap at ~60 per Text Search, and the ToS forbids storing or reusing anything you fetch \u2014 so an audit/spec-site pipeline built on your own Google Cloud key is both expensive and a terminable ToS breach tied to your billing account.",
+   "GBP listings never contain an email address \u2014 every 'Google Maps email scraper' actually crawls the linked website. For your exact target (businesses with NO website) the standard enrichment returns nothing, and trades (plumbers/pool techs) have the lowest email-match rates; plan on Facebook-About extraction, phone, and physical channels instead of expecting scraped emails.",
+   "Whois is mostly dead as an owner-contact source: post-GDPR, registries redact registrant name/email in whois/RDAP responses; you'll usually only get registrar and abuse contacts. Treat it as an occasional bonus, not a pipeline step.",
+   "Sunbiz caveats: the Registered Agent is often a lawyer or filing service, not the owner \u2014 use the Officer/Director (or Authorized Member/Manager) detail instead; the GBP display name is often a DBA/fictitious name that differs from the registered entity name, so search Sunbiz's fictitious-name records or by street address/zip when the entity-name search misses; and Sunbiz gives name + mailing address but never email or phone.",
+   "Photo reuse red lines: only reuse photos from the 'By owner' image category (owner-uploaded = the business's own copyright). Customer/reviewer photos belong to those reviewers and Street View imagery belongs to Google (screenshots prohibited) \u2014 using either in a spec site is a genuine third-party copyright problem, not just a ToS one. Keep spec sites unlisted/noindexed, label them as drafts, and pull immediately on request; also don't hotlink googleusercontent URLs in anything long-lived (they can be resized via URL params but may rot or reveal your scrape) \u2014 rehost the handful you use per prospect.",
+   "Review-reply signature mining fails for unclaimed listings (no owner replies exist) \u2014 but unclaimed + no website is your best prospect segment, so expect the owner-name fill rate there to depend almost entirely on Sunbiz + Facebook, and budget ~70% fill at best even with a layered stack.",
+   "Facebook About emails and pages can be years out of date \u2014 always SMTP-verify (ZeroBounce/MillionVerifier/Outscraper validator) before sending; >2-3% bounce rates damage sender reputation. Also don't scrape personal profiles/groups \u2014 stick to public Page About data.",
+   "CAN-SPAM applies to the cold email itself (physical address, working unsubscribe, opt-outs honored within 10 days); Florida B2B outreach avoids GDPR, but calling/texting cell numbers found via enrichment triggers TCPA \u2014 keep texting out of the first touch unless you have consent.",
+   "Don't conflate 'publicly visible' with 'licensed': scraping GBP at scale violates Google's consumer Maps terms (no bulk feeds, no building business-listing databases or mailing lists) even when done without an API key. Enforcement is IP blocking/account action rather than lawsuits against small agencies, and third-party scrapers absorb most of that risk \u2014 but never mix scraped data flows with a Google account/key you depend on (e.g. your Business Profile or Workspace)."
+  ],
+  "sources": [
+   "https://outscraper.com/google-maps-api/",
+   "https://outscraper.com/google-maps-scraper-v2/",
+   "https://outscraper.com/enrichment-services/",
+   "https://outscraper.com/pricing/",
+   "https://serpapi.com/maps-place-results",
+   "https://serpapi.com/google-maps-reviews-api",
+   "https://dataforseo.com/apis/business-data-api/google-my-business",
+   "https://docs.dataforseo.com/v3/business_data-google-questions_and_answers-task_post/",
+   "https://apify.com/compass/crawler-google-places",
+   "https://use-apify.com/docs/best-apify-actors/best-google-maps-scrapers",
+   "https://apify.com/api/google-places-api",
+   "https://goodenoughmaps.com/blog/google-places-api-pricing",
+   "https://developers.google.com/maps/billing-and-pricing/sku-details",
+   "https://apio.sh/apis/google-places",
+   "https://www.safegraph.com/guides/google-places-api-pricing/",
+   "https://gmapsscraper.io/blog/find-business-owner-contact-info",
+   "https://gmapsscraper.io/blog/cold-email-google-maps-leads-workflow",
+   "https://localprospects.ai/articles/how-to-find-local-business-owner-names",
+   "https://localprospects.ai/articles/find-company-owner-information-public-pages",
+   "https://cazalead.com/blog/how-to-extract-emails-from-google-maps",
+   "https://dos.fl.gov/sunbiz/search/guides/corporation-records/",
+   "https://search.sunbiz.org/Inquiry/CorporationSearch/ByOfficerOrRegisteredAgent",
+   "https://dos.fl.gov/sunbiz/about-us/faqs/",
+   "https://cloud.google.com/archive/maps-platform/terms-20250604",
+   "https://www.google.com/intl/en/help/terms_maps/",
+   "https://support.google.com/business/answer/9292476?hl=en-GB",
+   "https://about.google/brand-resource-center/products-and-services/geo-guidelines",
+   "https://emailsneak.com/facebook-email-extractor",
+   "https://apify.com/contacts-api/facebook-b2b-lead-generator-email-scraper/input-schema",
+   "https://growleads.io/blog/find-any-business-owners-email-quick-simple-b2b-guide/",
+   "https://apify.com/parseforge/rdap-domain-lookup-scraper"
+  ]
+ },
+ "v2:a91a82c9d5c44c1d6da1b636c49bbd5421cf87a1266bbdd1f058db064390a59b": {
+  "summary": "The \"I already built you a website\" spec-work method is alive and converting in 2024-2026 because AI compressed build cost from 8-20 hours to 10-30 minutes, making pre-built demos economical at outreach scale. Practitioners find no-website businesses via Google Maps' empty website field (filterable in bulk with Outscraper, Get Map Leads, or the Places API), qualify on review count/recency, then lead with a LIVE personalized site link (not screenshots) \u2014 the best-documented result is Spencer Reese's cold-call script booking 3 meetings from 19 calls, with email-only response around 5% and personalized outreach hitting 8-15% replies. The dominant monetization is free-or-cheap build + $97-99/month hosting/care retainer (foot-in-the-door for automations and AI upsells \u2014 exactly GAELWORX's ladder). Legal hygiene matters: the business's logo and photos are their IP, so practitioners use placeholder branding or scraped-with-caution content, noindex/password-protect demos on their own subdomain, add a visible \"demo/preview\" banner, and keep the link private to the owner.",
+  "tactics": [
+   {
+    "tactic": "Source no-website leads from Google Maps' empty website field, filtered in bulk",
+    "evidence": "Outscraper documents a dedicated 'Only Without website' + 'Operational only' advanced filter on its Google Maps scraper and reports (citing Clutch surveys) that 1-in-5 to 1-in-3 small businesses have no website; recommends confirming activity via working phone, recent reviews, and hours before outreach, plus checking directories (Yellow Pages, Thumbtack) and Facebook/Instagram-only profiles as a second layer. Get Map Leads says 20-40% of local businesses (60%+ in some niches) have no site and its Chrome extension flags them with a one-click no-website badge. Stitch & Snare and multiple open-source pipelines (Curb, lead-gen-website-pipeline) do the same via Google Places API filtered to results with no website listed.",
+    "source": "https://outscraper.com/how-to-find-businesses-without-website-for-cold-outreach"
+   },
+   {
+    "tactic": "Qualify on reviews-but-no-website: active revenue signal + visible gap",
+    "evidence": "Get Map Leads' qualification standard: 20+ (ideally 30-100+) Google reviews, reviews within the last 60-90 days, phone number listed, complete profile \u2014 'reviews mean customers, and customers mean budget for a website.' In a typical city scrape, 20-40% of no-website businesses meet this bar. Outscraper agrees the strong signal is 'active business + clear category + phone number + reviews + missing website field,' not zero online presence. Always double-check by Googling 'business name + city' since the GMB field can be empty while a site exists.",
+    "source": "https://getmapleads.io/blog/how-to-find-businesses-without-website"
+   },
+   {
+    "tactic": "The call-first Spencer Reese script: claim/promise the built site, book a 10-15 min video call",
+    "evidence": "Whitney Bonds' tutorial (Nov 2025, documenting Spencer Reese's viral result): script verbatim \u2014 'Hey, I saw your business on Google and you have some great reviews, but I noticed you don't have a website. So I went ahead and built you a beautiful website to help you get more jobs. Was wondering if you had 10-15 minutes tomorrow to jump on a quick video call to check it out.' He made 19 calls and booked 3 meetings that day, and commenters replicated it. Notably, Reese calls FIRST and only builds the site after a yes \u2014 the build happens between the call and the demo meeting (an honesty gap worth closing by actually pre-building, which AI now makes cheap).",
+    "source": "https://www.youtube.com/watch?v=pjsBwHndBbk"
+   },
+   {
+    "tactic": "Present a LIVE link with their real content \u2014 not lorem ipsum, not screenshots",
+    "evidence": "Dev.to practitioner (ryancwynar): scrape the business's real copy, images, phone number and services into an AI-generated static site deployed to GitHub Pages in 10-15 minutes \u2014 'when a roofing company owner sees their own phone number... on a polished modern site, it clicks immediately'; he pairs it with an automated before/after screenshot ('the contrast does the selling'). Stitch & Snare: 'Not a mockup. It goes live on GitHub Pages and the link goes in the outreach email... We're not asking if they want a website. We're showing them one.' Agency tester Lachlan (GHL AI Studio): 'The demo site IS the lead magnet. Not a PDF. Not a case study. Not a Loom video' \u2014 sent before the call so the prospect views it on their phone while you talk.",
+    "source": "https://dev.to/ryancwynar/spec-work-at-scale-using-ai-to-redesign-small-business-websites-before-they-ask-4on"
+   },
+   {
+    "tactic": "Instrument demo URLs with per-prospect tracking to score and prioritize follow-up",
+    "evidence": "ryancwynar embeds a unique tracking parameter per prospect: 'A prospect who visits their redesign five times in two days is warm. A prospect who never clicks is cold. I focus my follow-up on the people who are already interested.' Open-source pipelines replicate this \u2014 Curb and SudcoAgent use private per-prospect URLs (/p/<id>, ?from=<prospect_id>) that log clicks back to the pipeline.",
+    "source": "https://dev.to/ryancwynar/spec-work-at-scale-using-ai-to-redesign-small-business-websites-before-they-ask-4on"
+   },
+   {
+    "tactic": "Email subject line and framing: 'I went ahead and built this for [Business Name]'",
+    "evidence": "Stitch & Snare (small FL studio) uses exactly that subject line with the live GitHub Pages demo link, closing flat-fee builds at $500. Prospeo's phone Script A uses the same reversal on objections: 'I actually already built it for you. Can I send it to you anyway? I can email or text the link.' LeadsAgent's data: the highest-converting email opener for no-website targets references their exact rating + review count then the missing website ('I noticed you're running without a website... people who Google your name after a referral land on your Maps listing but can't learn much'), with follow-up: 'Happy to share a quick example of what that looks like.'",
+    "source": "https://stitchandsnare.com/blog/free-lead-gen-tool-how-we-built-our-own-for-0/"
+   },
+   {
+    "tactic": "Realistic conversion benchmarks: ~5% email-only, 8-15% personalized reply, calls close it",
+    "evidence": "ryancwynar: 'Email alone has maybe a 5% response rate. A call referencing the redesign you sent gets much higher engagement... closing requires a phone call.' LeadsAgent: generic cold email 1-3% reply vs 8-15% with one specific data point (review count / missing website). Get Map Leads: 5-10% of answered calls to no-website businesses express genuine interest, most closes happen on the 2nd-3rd contact, claiming 2-5 clients/week from 40-80-call sessions (vendor claim). Prospeo's math: 15-30% connect rate, 1-5% meeting-book rate, 2-5% call-to-deal \u2014 50 calls/day for a month \u2248 2-3 closed sites. A widely-circulated X workflow (implemented in local-biz-swarm) claims 10-15% reply and 30-50% close on positive replies for 30 personalized demo+video sequences per weekend \u2014 treat as optimistic upper bound.",
+    "source": "https://leadsagent.io/blog/web-agency/cold-outreach-scripts-web-design-clients"
+   },
+   {
+    "tactic": "Objection-handling script for 'Why did you build me a website?'",
+    "evidence": "A circulating 'Free Preview Pitch' cold-call script handles the method's unique objections verbatim: 'Why did you build me a website?' \u2192 'I build sites for local businesses as practice and outreach. I picked yours because I liked what you do... It's free to look at, no pressure.' 'All my business is word of mouth' \u2192 'When someone Googles your name and doesn't see a real site, they land on Yelp/Angi/Facebook... the site makes sure people who hear about you land on your page, not a competitor's.' 'What's it cost?' \u2192 'Honestly, nothing yet... If you like it, we can talk about something fair.' Ask: 24 hours + a 10-minute call; 'if you hate it, you don't pay.'",
+    "source": "https://www.scribd.com/document/1020937067/Cold-Calling-Script"
+   },
+   {
+    "tactic": "Structured call flow: review-count opener, 2-minute pitch, book the callback \u2014 never close call #1",
+    "evidence": "Get Map Leads' script: confirm the owner, then 'I saw you've got [exact review count] reviews, which is brilliant. I noticed you don't have a website yet... Is now a bad time for a two-minute chat?' Pitch = 'people click your Maps listing and there's nothing to land on.' End by asking to SEND something (examples/demo/audit), lock a specific callback time, and deliver the artifact before the callback so the prospect has already seen your branded work when you ring back. Best windows: Tue-Thu 9am-12pm; first call 2-3 minutes max.",
+    "source": "https://getmapleads.io/blog/cold-calling-script-web-design-agencies"
+   },
+   {
+    "tactic": "Multi-channel delivery: SMS/iMessage/WhatsApp with the mockup for owners who don't do email",
+    "evidence": "Prospeo: pair every call with a same-day text/email \u2014 'I put together a quick concept \u2014 here's the link. Takes 30 seconds to look at'; trades answer phones, not inboxes. Xuro Agency Automator ships the demo mockup simultaneously via email, iMessage (real phone number via AppleScript), and WhatsApp because 'local businesses rarely check email but respond instantly to WhatsApp.' local-biz-swarm routes by vertical: SMS (Twilio) for trades, Instagram DM for visual businesses, email default \u2014 and attaches a 10-second cinematic video walkthrough of the mockup for phones.",
+    "source": "https://prospeo.io/s/cold-calling-web-design-sales"
+   },
+   {
+    "tactic": "Drip sequence with preview-expiry urgency: Day 0/3/7/14/30",
+    "evidence": "The open-source lead-gen-website-pipeline (Claude skill, deployed to Vercel) codifies the 'proven pattern': Day 0 'I built you a website \u2014 take a look' (demo link); Day 3 social proof ('businesses like yours saw 30-40% more calls'); Day 7 urgency ('your preview expires soon'); Day 14 'taking it down today'; Day 30 breakup. Its automated QA enforces a robots noindex meta tag, a visible demo banner, and footer attribution on every generated demo, and rate-limits deploys. Deliverability side (LeadsAgent): send cold from a separate warmed domain, 15-20/day ramping to 30-40.",
+    "source": "https://implexa.ai/s/clawhub/lead-gen-website-pipeline"
+   },
+   {
+    "tactic": "Pricing model A \u2014 free/cheap build + monthly hosting retainer as foot-in-the-door for upsells",
+    "evidence": "Whitney Bonds/GHL model: 'You give them the website for free and the only thing they pay for is hosting \u2014 $97 a month... a foot-in-the-door offer. Once they're in your ecosystem you can offer tools that make them money' \u2014 she sold an AI voice agent for $997 to an HVAC contractor and threw the website in free to build trust. Comparable operating models: Websites Like A Boss ($0 upfront, $97/mo incl. booking system), SiteFlow ($0 upfront, $79-379/mo tiers), CalTech Web ($99/mo all-in, 800+ sites, refund-and-keep-the-site guarantee), DigiSurf ($300 setup + $49-99/mo, buyout option after 24 months). SudcoAgent's cold emails pitch a 4-tier ladder: site refresh $800, GBP+SEO $300-500, review-funnel automation $200/mo, reputation monitoring $150/mo.",
+    "source": "https://www.youtube.com/watch?v=pjsBwHndBbk"
+   },
+   {
+    "tactic": "Pricing model B \u2014 flat build fee + recurring care plan with a 12-month minimum",
+    "evidence": "Stitch & Snare closes demo-site leads at a flat $500. Tyler Digital charges $1,500 build + $99/mo (hosting, SSL, domain, 2 updates/mo, 12-month minimum: 'the build fee covers fulfillment cost, the recurring is the actual relationship... it filters out price-shoppers who'd churn'), with a '7 days live or it's free' guarantee and no lock-in (client keeps code/domain). The recurring hard cost is ~$2-5/mo hosting \u2014 the margin funds support and makes the model sustainable.",
+    "source": "https://tylerdigitalco.com/pricing/"
+   },
+   {
+    "tactic": "Legal/etiquette hygiene: their logo and photos are their IP \u2014 keep demos private, noindexed, labeled",
+    "evidence": "SitePoint forum consensus on spec mockups: the logo is the business's intellectual property; showing it privately to the owner is defensible, publishing is not \u2014 the safe pattern is a placeholder ('your logo would sit here') or asking permission in writing. CopyWeb's 2026 risk matrix rates 'client prototype shown internally' low-medium risk (watermark, replace brand assets, label as prototype) vs 'public site on your own domain with their branding' high risk (copyright + trade dress + trademark). A JustAnswer case shows an agency getting a copyright demand for showing a client's photo-laden mockup in its portfolio without permission. Practitioner pipelines bake in mitigations: noindex meta + demo banner + private per-prospect URLs + 7-day-expiring previews (lead-gen-website-pipeline, Needle, SudcoAgent); staging-SEO guides say to layer noindex + robots.txt disallow + password/IP protection since noindex alone can fail.",
+    "source": "https://www.sitepoint.com/community/t/mock-ups-without-clients-knowledge-legalities/46889"
+   },
+   {
+    "tactic": "Contract protections for the eventual close: IP warranties and indemnification",
+    "evidence": "IP attorney guidance (PJL): copyright infringement doesn't require intent \u2014 a freelancer using photos/copy the business didn't own can be liable; the contract should include IP warranties (client confirms rights to supplied materials), indemnification clauses, and clear ownership terms. Relevant to spec sites because content scraped from a prospect's GBP/Facebook may itself be photography the business never licensed.",
+    "source": "https://www.pjlesq.com/post/tortious-interference-and-copyright-infringement-risks-for-independent-designers-and-web-developers"
+   },
+   {
+    "tactic": "Industrialize with a boilerplate per niche, one metro at a time, human-approved sends",
+    "evidence": "Lachlan: 'Don't build from scratch every time. Build one solid template per industry (plumber, electrician, handyman, cleaner), then swap in their business name, suburb, services, and real photos from Google Business Profile or socials.' ryancwynar: high-LTV ugly-site service niches (roofing, dental, HVAC) respond best; 'saturation is real \u2014 in a small metro you'll run through the best prospects quickly,' so build to expand geographically. Curb and SudcoAgent keep a human-in-the-loop approval gate on every demo and email before send.",
+    "source": "https://lachlancb.me/effortless-sales-weapon-demo-sites/"
+   },
+   {
+    "tactic": "Sell outcomes on the demo call, not the artifact \u2014 the SEO/leads system is the real product",
+    "evidence": "Lachlan: AI builders 'ate the sub-$2,000 website market'; the demo kills the trust objection but the value is 'does it rank, does it generate leads, does it integrate with a CRM' \u2014 i.e., the retainer services. SteadyScaling's Frontload case study is the proof-point to cite in pitches: a window-cleaning business with zero web presence got 4 inbound leads in 14 days with $0 ad spend because 700+ keywords of SEO were built in before launch, with the owner on camera. That's the 'website as lead system' narrative that justifies recurring fees over a $99 Wix alternative.",
+    "source": "https://steadyscaling.com/resources/the-frontload-technique"
+   }
+  ],
+  "sources": [
+   "https://www.youtube.com/watch?v=pjsBwHndBbk",
+   "https://dev.to/ryancwynar/spec-work-at-scale-using-ai-to-redesign-small-business-websites-before-they-ask-4on",
+   "https://stitchandsnare.com/blog/free-lead-gen-tool-how-we-built-our-own-for-0/",
+   "https://lachlancb.me/effortless-sales-weapon-demo-sites/",
+   "https://outscraper.com/how-to-find-businesses-without-website-for-cold-outreach",
+   "https://outscraper.com/local-businesses-without-websites/",
+   "https://getmapleads.io/blog/how-to-find-businesses-without-website",
+   "https://getmapleads.io/blog/cold-calling-script-web-design-agencies",
+   "https://prospeo.io/s/cold-calling-web-design-sales",
+   "https://leadsagent.io/blog/web-agency/cold-outreach-scripts-web-design-clients",
+   "https://www.scribd.com/document/1020937067/Cold-Calling-Script",
+   "https://implexa.ai/s/clawhub/lead-gen-website-pipeline",
+   "https://github.com/braedonsaunders/curb",
+   "https://github.com/raghuramdas/local-biz-swarm",
+   "https://github.com/nsuderman/SudcoAgent",
+   "https://tylerdigitalco.com/pricing/",
+   "https://caltechweb.com/affordable-web-design-company/",
+   "https://siteflowpro.com/",
+   "https://www.websiteslikeaboss.com/how-our-free-website-model-works-and-why-its-actually-better-for-you",
+   "https://digisurfagency.com/subscription-web-design-us",
+   "https://steadyscaling.com/resources/the-frontload-technique",
+   "https://www.sitepoint.com/community/t/mock-ups-without-clients-knowledge-legalities/46889",
+   "https://copyweb.net/blog/is-website-cloning-legal",
+   "https://www.pjlesq.com/post/tortious-interference-and-copyright-infringement-risks-for-independent-designers-and-web-developers",
+   "https://www.justanswer.com/intellectual-property-law/rrxzq-company-built-website-using-mockup.html",
+   "https://www.conductor.com/academy/protect-staging-environment/",
+   "https://www.searchviu.com/en/robots-txt-staging-environment/",
+   "https://buzzlead.io/learn/how-i-emailed-10000-businesses-in-30-days-and-closed-15k-mrr-for-under-1000",
+   "https://cartmango.com/sell-websites-to-small-businesses/",
+   "https://www.warriorforum.com/offline-marketing/537972-mailing-out-screenshots-instead-showing-demos.html",
+   "https://freelancing.stackexchange.com/questions/1980/can-i-use-logos-of-companies-i-have-worked-for-directly-indirectly-on-my-web"
+  ],
+  "pitfalls": [
+   "Saying 'I already built you a website' when you haven't (the Spencer Reese call-first variant) is a credibility and ethics landmine if the prospect asks to see it on the spot \u2014 with AI builds at 10-30 minutes, actually pre-build for shortlisted leads or promise a '24-hour free preview' instead.",
+   "Publishing a public demo with the business's real logo, name, and photos exposes you to trademark/trade-dress and copyright claims (logo = their IP per SitePoint/CopyWeb; an agency got a takedown demand just for a portfolio mockup with a client's photos). Mitigate: placeholder logo or written permission, licensed/AI imagery instead of scraped photos, visible 'DEMO/PREVIEW' banner, private per-prospect URL shared only with the owner.",
+   "Leaving demos crawlable creates SEO/duplicate-content and brand-confusion problems \u2014 noindex alone can fail if links point at it; layer noindex meta + robots.txt disallow + password or expiring URLs (practitioner pipelines expire previews in ~7 days and cap what's deployed).",
+   "Email-only outreach caps at roughly 5% response even with a live demo link \u2014 the close happens on a phone call/video walkthrough referencing the demo; budget for calling, and lock a specific callback time on call #1 rather than trying to close it.",
+   "The GMB website field being empty doesn't guarantee no site exists (and some no-website businesses are deliberately referral-only or 'too busy' \u2014 a Warrior Forum poster made 80 calls with zero interest on a badly targeted list). Verify by Googling name+city and qualify on 20+ recent reviews before spending build time.",
+   "Free-build + monthly-retainer economics break on churn and price-shoppers \u2014 practitioners use 12-month minimums, Stripe auto-billing, and clear 'you own the code/domain' terms to avoid hostage-site reputation damage while protecting the recurring base.",
+   "AI-generated demos are prototypes, not deliverables: recognizable template bones, weak SEO/schema, no blog/e-com \u2014 pitch the demo as a preview and sell the real build + ranking system, or the client compares you to $20/mo Wix and wins.",
+   "Vendor-published conversion claims (2-5 clients/week, 30-50% close) are marketing for scrapers/courses \u2014 plan on practitioner-grade numbers (8-15% reply on personalized touches, 1-5% meeting rate on calls, closes on contact 2-3) and expect local-metro lead saturation, so design the pipeline to rotate niches/geos.",
+   "Cold-email deliverability: sending demo links at volume from your main domain torches it \u2014 use a separate warmed domain, 15-20 sends/day ramping, and plain-text-plus-link over heavy HTML attachments.",
+   "Don't quote a price on the first call and don't lead with cost \u2014 every script that converts leads with the specific observable gap (review count + no website) and a low-commitment ask (look at something you already made)."
+  ]
+ },
+ "v2:44cbd535d28800f3ff3ccf459a1124b1d0e413bd089ee2646c7961ec919aa9db": {
+  "summary": "AI instant-site builders (Durable, Mixo, Wegic, B12, 10Web) all converge on the same SMB one-pager formula \u2014 hero with localized headline + lead CTA, services grid, about, testimonials, tiered pricing, contact form, embedded map, plus bundled booking/CRM/review widgets \u2014 at $12-40/mo per site retail, with agency white-label/API routes (10Web ~$25/site at volume, Brizy $159/mo for 10 sites) explicitly marketed for \"personalized outbound and bulk site creation.\" The mockup-first spec-site play GAELWORX wants is a proven, well-documented outreach tactic: tools like ProspectUp, Solid Digital's engine, and DIY GitHub-Pages pipelines generate a hosted, tracked preview site per prospect from their GBP data and reviews for ~$0-1/lead, which strongly validates building your own static HTML template instead of renting a builder (builders like Mixo/Durable also lock you in with no HTML export). The ideal pool-service one-pager is well specified by industry sources: 5-second-test hero (service + city + 3 differentiators + star rating), click-to-call in a sticky header/bottom bar, a dense trust stack (license #, CPO cert, insured, years, pools serviced), green-to-clean before/after photos, a live Google-reviews wall, an explicit service-area map with named cities, a 3-5 field quote form, and an FAQ \u2014 converting at 2-5% when done right vs <0.5% when not.",
+  "tactics": [
+   {
+    "tactic": "Copy the proven AI-builder one-pager anatomy as the skeleton of the GAELWORX static template",
+    "evidence": "A generated Durable site for a service business contains: hero with contextually relevant background image and a unique lead-gen CTA button (not generic 'Contact'), client-logo/services section with relevant images, About Us with its own CTA, past-project image carousel, tiered pricing section with a highlighted 'most popular' option, testimonial block, simple contact form, and free embedded map for local businesses \u2014 plus drag-in premade sections for FAQs, business hours, team members, and a booking/schedule widget. Cybernews/Ordoh tests confirm the 28-30s generation produces hero+tagline, services block with benefit-driven descriptions, about, contact form, and footer.",
+    "source": "https://www.makingthatwebsite.com/durable-ai-website-builder-review/"
+   },
+   {
+    "tactic": "Match the feature bar the builders set: booking, review embeds, and lead capture are now table stakes on generated SMB sites",
+    "evidence": "Durable bundles bookings ('Let customers book services right from your website'), Google/Facebook review display toggles, a CRM that auto-captures contact-form leads with auto-replies, invoicing via Stripe, and SEO/GEO (AI-search visibility) into every paid plan; it markets this as replacing ~7 subscriptions ($396/mo of tools) with a $25/mo plan. A static GAELWORX template can match this with Calendly/booking embed, a Google-reviews widget, and a form that posts into your own automation stack \u2014 which is also the upsell path.",
+    "source": "https://website-builders.cybernews.com/durable-ai-website-builder-review/"
+   },
+   {
+    "tactic": "Know the retail price anchors when pitching against DIY builders",
+    "evidence": "2026 pricing: Durable Free (subdomain) / Launch $22-25/mo / Grow $85-99/mo; older-cited tiers $12 (Starter) and $20 (Business). Mixo: Free / Business $20/mo ($16 annual) / Premium $40/mo ($32 annual) \u2014 landing-page-only, no blog/ecommerce. Wegic: $2.99 first-generation trial, then credit-based Starter $39.90/mo (600 credits, includes code download) or Premium $69.90/mo (custom domain). B12 runs a '$1/mo for 3 months' promo and positions service-business workflows (intake, scheduling, invoicing, eSignatures). GAELWORX's pitch: for what an owner pays Durable in a year (~$264+), they get a generic template site they never edit \u2014 versus a hand-finished custom site.",
+    "source": "https://getdailytoolbox.com/ai-tools/mixo-review/"
+   },
+   {
+    "tactic": "White-label/API mass production is a mature agency model \u2014 10Web is the reference implementation",
+    "evidence": "10Web sells a fully white-labeled reseller dashboard (your domain, logo, billing via Stripe/PayPal, client portal) and an API explicitly 'built for personalized outbound, automation, and bulk site creation' \u2014 generate a live WordPress site from a prompt/URL programmatically, DNS managed via API. Volume pricing advertised 'as low as ~$25 per website', with agency testimonials of going 'from 4 sites a month to 32, same team.' Brizy's white-label AI builder starts at $159/mo including 10 websites, +$8/mo per additional site, with Google Business Profile as a generation input.",
+    "source": "https://10web.io/ai-website-builder/for-agencies/"
+   },
+   {
+    "tactic": "Use the mockup-first cold email as the outreach frame for the spec-site wedge",
+    "evidence": "Prospeo's playbook: spend 1-2 hours (or automate) building a homepage mockup with the prospect's existing content, send a plain-text email ('I had a few ideas for how [Business] could work harder for you, so I put together a quick mockup'), never include price in email 1; one freelancer sends 12-15/week and books 3-4 calls. Follow-up cadence: Day 0 mockup, Day 3 case study with before/after, Day 7 free audit offer \u2014 note the Day-7 audit is exactly GAELWORX's existing report-card wedge, so the spec site and audit slot into one sequence.",
+    "source": "https://prospeo.io/s/web-design-sales-pitch-example"
+   },
+   {
+    "tactic": "Build the spec site from the prospect's own Google Business Profile data and reviews, host it on your subdomain, and track opens",
+    "evidence": "ProspectUp generates a hosted 'your new site' mockup in ~90s from one URL: pulls logo, GBP photos, reviews, hours, services; writes the hero headline from best-scored review themes ('award-winning brisket'); serves it at mockups.youragency.com with view/time-on-page tracking and an agency CTA bar, for ~$1/lead. Solid Digital built the same in-house: scrape brand assets \u2192 AI-generated HTML homepage concept \u2192 personalized URL \u2192 automated drip emails, reporting dramatically higher engagement than generic outreach. Stitch & Snare (small FL studio) does it for $0 with GitHub Pages + Supabase + Google Places API, targeting businesses with NO website and closing flat-fee $500 builds; Xuro's open-source automator scrapes Maps for no-website businesses and sends mockups via email/iMessage/WhatsApp.",
+    "source": "https://www.prospectup.ai/features/instant-website-mockups"
+   },
+   {
+    "tactic": "Pool one-pager hero must pass the 5-second test: service + city + 3 proof points + star rating above the fold",
+    "evidence": "76% of pool service sites fail the 5-second test (what you do, where, why you). Winning formula cited: 'Expert Pool Cleaning & Maintenance in Phoenix, AZ \u2014 Same-Day Service, Licensed Technicians, 5-Star Rated.' Homepage must convince within 15 seconds: clear headline with location, prominent phone + form above the fold, 2-3 trust signals (star rating, review count, years in business), and a strong before/after photo. Sites that get the fundamentals right convert 2-5%; ones that don't convert under 0.5%.",
+    "source": "https://contentworks.ai/pool-service-website-messaging/"
+   },
+   {
+    "tactic": "Click-to-call everywhere: header on desktop, sticky bottom bar on mobile, plus a click-to-text option",
+    "evidence": "71% of consumers (including Gen Z per McKinsey 2024) call as first contact; 70%+ of pool-service searches are mobile; phone number must be visible on every page without scrolling \u2014 header on desktop, sticky bottom bar on mobile. Specific benefit-driven CTAs outperform 'Contact us' by 64%: 'Get Your Free Pool Inspection', 'Book Same-Day Pool Rescue', 'Schedule Your No-Obligation Water Test'. Place a short testimonial directly beside the contact form for up to +34% conversion.",
+    "source": "https://www.poolfounder.com/pool-service-website-checklist"
+   },
+   {
+    "tactic": "Stack pool-specific trust signals on the homepage, not the About page",
+    "evidence": "The convert-relevant trust stack for pool companies: state contractor license # (with expiration), CPO (Certified Pool Operator) certification, general liability + workers-comp insurance, Pentair/Hayward factory-trained badges, PHTA/APSP membership, BBB, years in business, pools serviced count, and current Google rating + review count on every page. Trust badges lift conversions ~32%; 61% of consumers won't act without visible trust signals; 87% use Google reviews to evaluate local businesses.",
+    "source": "https://clicksgeek.com/web-design-for-pool-service/"
+   },
+   {
+    "tactic": "Use a live Google-reviews wall instead of typed testimonials, and green-to-clean before/after photos instead of stock",
+    "evidence": "Sumy Designs: pull actual Google reviews (real names, profile photos, live star rating) via widget \u2014 typed-in testimonials trigger skepticism, a verifiable 80-review 4.8-star widget doesn't. Before/after photos of real jobs drive an 83% engagement increase over stock (Pool Founder); 'the visual transformation from green to crystal clear is more convincing than any written testimonial.' Caption gallery images with location-anchored quotes ('This Paradise Valley pool went from green to swim-ready in 24 hours').",
+    "source": "https://www.sumydesigns.com/pool-service-company-websites/"
+   },
+   {
+    "tactic": "Make the service area unmissable: named cities in the hero/H2, a service-area map section, and ZIP codes in the footer",
+    "evidence": "The #1 visitor question is 'are you in my area?' \u2014 if a Naperville visitor can't tell within 10 seconds, they leave. Put location in header/first section; include a dedicated Service Areas section listing every city/neighborhood + embedded Google Map showing the radius. JennyB's pool-site case study used a custom map graphic of the exact 12 towns served, which killed out-of-area calls. (Full multi-page sites add one SEO page per city \u2014 46% of Google searches have local intent \u2014 but for a one-pager the map + explicit city list is the minimum.)",
+    "source": "https://www.sumydesigns.com/pool-service-company-websites/"
+   },
+   {
+    "tactic": "Quote form: 3-5 fields max, with light qualification built in",
+    "evidence": "Form abandonment spikes above 5 fields on mobile; ask only name, phone, email, address/ZIP (verifies service area), and service-type dropdown. JennyB's case study added pool-type screening (inground vs above-ground triggering a 'we don't service those' message) and address verification, which eliminated hours of unqualified calls \u2014 a useful option for the GAELWORX template as a differentiator vs builder defaults.",
+    "source": "https://jennyb-designs.com/pool-service-website-design/"
+   },
+   {
+    "tactic": "Include an FAQ block answering pricing, licensing/insurance, contracts, and chemical safety",
+    "evidence": "Sites with robust FAQ sections see 37% higher conversion. The questions customers actually search: 'How much does regular pool service cost in [City]?', 'What's included in weekly service?', 'Do I need a long-term contract?', 'Are your technicians certified/licensed/insured?', 'How do you handle chemical safety around kids and pets?', 'Do I need to be home during visits?' \u2014 these double as long-tail SEO targets.",
+    "source": "https://contentworks.ai/pool-service-website-messaging/"
+   },
+   {
+    "tactic": "Offer booking as preference-windows + prepayment, not open calendar slots",
+    "evidence": "Sumy Designs' highest-recommended pool-site feature: online scheduling for openings/closings where the customer picks three preferred weeks (not exact dates) and pays at booking \u2014 owner keeps calendar control, job is booked and paid before arrival, no invoice chasing. Pool Founder concurs that booking calendars suit recurring maintenance signups but exact-slot booking is overkill for jobs needing assessment first; skip chat widgets unless replies come within 2-3 minutes.",
+    "source": "https://www.sumydesigns.com/pool-service-company-websites/"
+   },
+   {
+    "tactic": "Recommended one-page section order for the GAELWORX pool template (synthesis of all sources)",
+    "evidence": "1) Sticky header: logo, city, tappable phone, 'Get Free Quote' button. 2) Hero: '[Service] in [City]' headline + 3 proof points + star-rating badge + dual CTA (Call Now / Free Quote) over a real clean-pool photo. 3) Trust bar: licensed #, insured, CPO, years, pools serviced, Google 4.8\u2605 (123). 4) Services grid: weekly cleaning & chemical balancing, green-to-clean recovery, equipment repair, opening/closing \u2014 each with its own CTA. 5) Before/after swipeable gallery. 6) Review wall (Google embed). 7) Service-area map + named cities/ZIPs. 8) About/owner + team photo (humanizes backyard access). 9) FAQ. 10) Final CTA + 4-field quote form with testimonial beside it. 11) Footer: NAP matching GBP + hours + LocalBusiness schema. Mobile: sticky call/text bar, <3s load, 44px tap targets, title tag '[Service] in [City] | [Company]'.",
+    "source": "https://www.poolfounder.com/pool-service-website-checklist"
+   },
+   {
+    "tactic": "Reference real pool-site examples for design cues",
+    "evidence": "CyberOptik's '20 Best Pool Cleaning Websites' names Desert Mountain Pool Service (clean layout, strong CTAs), Tony's Pool and Spa (online personalized cost estimates), 4Seasons Pool Service (sticky nav + always-visible phone), Payan Pool Service (sticky nav, organized service outlines). Service Autopilot's roundup highlights Patriot Pool and Spa (homepage Service Area section + AI chatbot), Pool Scouts (interactive service-area map \u2014 'one of the most strategic features'), Aqua Bright (full-screen water hero, parallax, deep testimonial page), and Atlas Pools (service-plan picker by budget). Common denominators: blue/white water palette, sticky navigation, homepage service-area treatment, review-heavy sections.",
+    "source": "https://www.cyberoptik.net/blog/best-pool-cleaning-websites/"
+   }
+  ],
+  "pitfalls": [
+   "Builder lock-in is real and is a selling point FOR GAELWORX: Mixo has no HTML export at all (cancel = site offline) and Durable has no export either \u2014 but it cuts both ways: Wegic's Starter plan DOES include 'Download Code', so 'you can't own your site with AI builders' is not universally true; keep the pitch accurate.",
+   "AI-generated copy is generic by design \u2014 every review notes 30-60 minutes of human editing needed to sound like the actual business. If GAELWORX mass-produces spec sites, the differentiation must come from real GBP data, real reviews, and real photos, or the sites will look like every Durable output.",
+   "Hosted mockup links can expire or look throwaway \u2014 Needle's workflow warns generated-page URLs die after 7 days; host spec sites on a GAELWORX-owned subdomain (e.g. previews.gaelworx.com) with tracking, like ProspectUp does.",
+   "Never put a price in the first cold email \u2014 it anchors to cost before value is established (Prospeo); lead with the spec site/audit, quote after the walkthrough.",
+   "Don't bury the phone number or the service area \u2014 the two most-cited conversion killers on pool sites; both must be visible without scrolling on mobile.",
+   "Skip the chat widget unless someone answers within 2-3 minutes during business hours \u2014 an unanswered chat is worse than none (Pool Founder).",
+   "Avoid exact-date self-serve booking calendars for assessment-required jobs \u2014 use preferred-week selection with payment capture instead (Sumy Designs).",
+   "Forms over 5 fields spike mobile abandonment; but too little qualification invites junk leads \u2014 include ZIP + pool-type dropdown as the middle ground.",
+   "A one-pager sacrifices the per-service and per-city SEO pages that capture 46% of local-intent searches \u2014 position the one-pager as the wedge deliverable and multi-page/service-area buildout as the paid upsell.",
+   "Don't fabricate testimonials or use stock pool photos \u2014 verifiable Google review embeds and real before/after job photos measurably outperform them, and typed testimonials trigger skepticism.",
+   "Some 'costs' data is marketing-sourced (10Web's ~$25/site, Brizy's tiers came from vendor pages; Durable pricing differs across reviews as plans changed between 2024-2026: $12/$20 old tiers vs $22/$85 current) \u2014 verify current pricing at pitch time."
+  ],
+  "sources": [
+   "https://www.makingthatwebsite.com/durable-ai-website-builder-review/",
+   "https://website-builders.cybernews.com/durable-ai-website-builder-review/",
+   "https://www.ordoh.com/durable-co-review/",
+   "https://aitoolshop.co/reviews/durable-review/",
+   "https://durable.com/",
+   "https://10web.io/white-label-website-builder/",
+   "https://10web.io/ai-website-builder/for-agencies/",
+   "https://10web.io/website-builder-api/msps-and-agencies/",
+   "https://www.brizy.io/white-label-ai-website-builder",
+   "https://10web.io/blog/white-label-ai-website-builder/",
+   "https://getdailytoolbox.com/ai-tools/mixo-review/",
+   "https://makerstack.co/reviews/mixo-review/",
+   "https://www.mixo.io/ai-website-builder",
+   "https://help.wegic.ai/welcome-to-wegic/plan-and-credits.md",
+   "https://www.b12.io/ai-website-builder-directory/wegic-ai/",
+   "https://prospeo.io/s/web-design-sales-pitch-example",
+   "https://www.prospectup.ai/features/instant-website-mockups",
+   "https://www.soliddigital.com/ai-lab/ai-prospecting-engine",
+   "https://stitchandsnare.com/blog/free-lead-gen-tool-how-we-built-our-own-for-0/",
+   "https://xuro.net/xuro-agency-automator/",
+   "https://needle.app/workflow-templates/redesign-ugly-sites-cold-outreach",
+   "https://www.poolfounder.com/pool-service-website-checklist",
+   "https://clicksgeek.com/web-design-for-pool-service/",
+   "https://www.poolmarketingpros.com/blog/7-website-elements-that-instantly-boost-pool-service-conversions/",
+   "https://www.poolmarketingpros.com/blog/how-to-build-a-pool-service-website-that-turns-visitors-into-leads/",
+   "https://contentworks.ai/pool-service-website-messaging/",
+   "https://www.sumydesigns.com/pool-service-company-websites/",
+   "https://www.serviceautopilot.com/pool-service/build-the-best-pool-service-website-for-your-business/",
+   "https://jennyb-designs.com/pool-service-website-design/",
+   "https://www.cyberoptik.net/blog/best-pool-cleaning-websites/",
+   "https://www.serviceautopilot.com/pool-service/7-pool-website-design-ideas-to-make-a-splash/"
+  ]
+ },
+ "v2:dca964cb88821e95c6249033a2165d13de910308ced407a958a8554825f2ba4a": {
+  "summary": "When there's no website to audit, practitioners audit the Google Business Profile as the de-facto homepage (completeness, categories, photos, review velocity/response rate, posts, Q&A, services), plus local pack position, NAP/directory consistency, and \u2014 new in 2025-26 and the biggest shock lever \u2014 live AI-assistant queries (\"who's the best pool company near me?\" run in ChatGPT/Gemini/Perplexity/AI Overviews with screenshots of the competitor that got named instead). Real scoring rubrics exist with published weights (e.g., completeness 25%, reviews 20%, photos 15%, categories 15%, NAP 15%, posts+Q&A 10%; GoHighLevel's 5x20% A-F grading sheet), so GAELWORX can score defensibly rather than arbitrarily. The metrics that make a no-website owner say \"I'm losing money\" are all competitor- and dollar-anchored: the review-count gap vs the actual 3 businesses in their local pack, the red-cells geo-grid/AI-invisibility screenshot, missed-call math (62% unanswered, 85% never call back, ~$1,200/missed home-services call), and a searches-per-month x avg-job-value revenue leak calculation. For a one-page scorecard: lead with the letter grade, keep the competitor table + one visual + 3 dollar-anchored findings + 3 next steps (7/30/90-day), and cut methodology, jargon, exhaustive checklists, and anything mid-grade.",
+  "tactics": [
+   {
+    "tactic": "Audit the GBP as the business's de-facto website using a 7-area agency framework: NAP accuracy, category selection (primary + up to 9 secondaries mined from top-3 competitors), photo count/recency/type-coverage, post frequency (weekly baseline; >30 days dormant = 'stale' flag), review quantity + velocity + response rate, Q&A activity, and competitive benchmarking",
+    "evidence": "Lead Oracle's agency GBP audit guide defines exactly these 7 core areas; specifics: <25 photos = 'significant room to improve', standard posts expire after 7 days so 3 weeks of silence looks stale, review velocity 'is the metric Google weights most heavily' (200 stale reviews lose to 80 reviews with 15 in the last 30 days), respond to every review within 24-48h, and secondary categories should be reverse-engineered from the profiles ranking 1-3 for target keywords",
+    "source": "https://www.leadoracle.ai/blog/how-to-audit-client-gbp"
+   },
+   {
+    "tactic": "Use published scoring weights so the report-card grade is defensible: Completeness 25% (8 sub-checks: name, address, phone, website, primary category, hours, description, primary photo), Reviews 20% (rating linear 3.0\u21924.5, count ramp to 50, recency full credit <30 days / half 30-90 / zero 90+), Photos 15% (full credit at 10+), Categories 15% (primary = 50%, ramp to 3 secondaries), NAP 15%, Posts+Q&A 10% (post in last 30 days + 1 answered Q&A). Mark categories 'ungraded' and re-weight when data is unavailable rather than penalizing",
+    "evidence": "rank.ai's free GBP audit publishes its exact rubric: 6 weighted categories summing to 100, every threshold documented (10 photos = 'looks active' because Google surfaces 8-10 before the More link; 4.5 stars / 50 reviews / 30-day recency for full credit), missing phone/address/website flagged 'high' severity, and ungraded categories dropped from the weighted average so the data source's gaps don't produce false failing grades",
+    "source": "https://www.rank.ai/gbp-audit"
+   },
+   {
+    "tactic": "Benchmark against the ACTUAL 3 businesses in the prospect's local pack, not national averages \u2014 record each pack member's review count, rating, last-review date, categories, and photo activity, then show the gap. The realistic target to show the owner is the weakest pack member's numbers",
+    "evidence": "Get Found Guy's 453-business Central Texas study: median reviews to rank varied 15x by trade (concrete ~11 vs HVAC ~182), and across all 153 packs the weakest pack member had a median of just 20 reviews \u2014 'that is your real target, not some scary number off a blog'; 95% of ranked businesses were 4.5 stars+. Local Falcon's 50M-result whitepaper confirms review requirements vary wildly by category and that fresh reviews are a trust signal (businesses that stopped collecting saw ranking declines)",
+    "source": "https://www.getfoundguy.com/blog/google-reviews-to-rank-map-pack/"
+   },
+   {
+    "tactic": "Run live AI-visibility tests as the centerpiece 'wow' section: query ChatGPT, Gemini, Perplexity, and Google AI Overviews with 3-5 real buying prompts ('best pool cleaning company in Tampa'), screenshot which competitor gets named instead, and score presence per platform (mentioned yes/no, rank, sentiment, contact-info accuracy)",
+    "evidence": "This is now a productized audit category: Local Vitals sells a 21-checkpoint diagnostic testing 5 AIs ('Your next customer asked AI... and you'll never see it happen. No click, no call, no missed-call log'); Harris & Ward offers a free AI Visibility Score vs local competitors; aivisitaudit.com shows a per-platform matrix (mentioned/sentiment/avg rank) with testimonials like 'We had 400+ Google reviews and ranked #1 locally. Then a patient told us ChatGPT recommended a different dentist. Our AI score was 22' \u2014 proof this metric shocks even well-ranked owners",
+    "source": "https://getlocalvitals.com/"
+   },
+   {
+    "tactic": "Anchor the AI section with the adoption stat: consumer use of AI for local business recommendations jumped from 6% to 45% in one year, making AI the #3 recommendation source \u2014 and AI weights the last 90 days of Google reviews, so a stale profile is invisible to it",
+    "evidence": "BrightLocal Local Consumer Review Survey 2026 (n=1,002 US adults): 45% used AI tools for local recommendations (up from 6% in 2025), ChatGPT leads at 31%, 40% trust AI recommendations (vs 32% who don't), 42% trust AI as much as written reviews, 82% read AI review summaries and 23% would decide on the summary alone; 74% of consumers only weight reviews from the last 90 days",
+    "source": "https://www.brightlocal.com/research/lcrs-ai-trust/"
+   },
+   {
+    "tactic": "Emotional lever #1 \u2014 the local pack exclusion visual: show a red/green geo-grid or a simple '3-pack' mock with the prospect absent, because the map pack captures ~44% of local clicks and 68% searcher trust (vs 27% for organic), and top-3 businesses get 126% more traffic and 93% more actions than those just outside",
+    "evidence": "BrightLocal's own agency page says agencies use the Local Search Grid as their primary hook: 'Showing a prospect a red-and-green map of their city \u2014 vividly illustrating exactly where their competitors are beating them \u2014 is often more persuasive than a list of keywords.' Locafy: 3-pack captures 44% of clicks, position-1 CTR 17.8%, 5.6% conversion vs 3.1% organic; Spartan SEM (citing Backlinko/Wiremo): 42% of clicks, 68% vs 27% trust, +126% traffic/+93% actions for top-3",
+    "source": "https://www.brightlocal.com/agencies/"
+   },
+   {
+    "tactic": "Emotional lever #2 \u2014 the review gap table: '#1 competitor has 200 reviews, you have 30' with velocity comparison (their reviews in the last 30 days vs yours). Frame it as the single factor explaining their position",
+    "evidence": "Storefront Audit's 27-point checklist: 'If the top 3 results have 200+ reviews and you have 30, that gap explains your position more than almost anything else on this checklist' \u2014 and if the gap is >50 reviews it's 'a material ranking disadvantage no amount of profile optimization will fully overcome'; also prescribes 4+ new reviews/month sustained and an 80% response-rate threshold ('fewer than 16 of your last 20 reviews answered = below 80% and costing you ranking')",
+    "source": "https://storefrontaudit.com/blog/how-to-audit-google-business-profile"
+   },
+   {
+    "tactic": "Emotional lever #3 \u2014 missed-call / unanswered-demand math (perfect setup for the AI voice agent upsell): 62% of calls to small businesses go unanswered, 85% of those callers never call back (they call a competitor), ~80% won't leave voicemail, and the average missed home-services call is worth ~$1,200",
+    "evidence": "411 Locals' original 30-day study of 85 businesses: 37.8% answered, 37.8% to voicemail, 24.3% no response = 62% unattended, 70% of businesses answered less than half their calls. Hicira's sourced stat roundup: 85% won't call back (BIA/Kelsey via Forbes), $1,200 avg missed home-services call (Invoca), <3% of voicemail callers leave a message; Zadarma adds 42% of SMBs estimate $500+/month lost and 37% of 1-star reviews cite missed/unreturned calls",
+    "source": "https://www.hicira.com/missed-call-statistics"
+   },
+   {
+    "tactic": "Emotional lever #4 \u2014 the personalized revenue-leak equation: local searches/month for their service x capture rate x avg job value = $/month bleeding to competitors. For no-website businesses add 'referral leakage': 20-35% of word-of-mouth referrals are lost at the verification step when there's nothing to check",
+    "evidence": "Atomix Digital models a roofer: 500 searches/mo x 5% conversion x $3-5K job x 20% close = $15,000-$25,000/month uncaptured ($180K-$300K/yr); LeadsAgent cites Google consumer research that a no-website business loses 20-35% of referred customers 'during the verification step \u2014 the moment between hearing about a business and deciding to contact them' (3 lost referrals x $500 = $18K/yr), plus 27% of US small businesses still have no website; Verisign data: businesses with websites see ~40% more revenue",
+    "source": "https://atomixdigital.com/blog/website-for-local-business-vs-no-website"
+   },
+   {
+    "tactic": "Emotional lever #5 \u2014 the urgency stats bar: 97-98% of consumers search online before visiting a local business, 76% of near-me searchers visit within 24 hours, 28% of local searches end in purchase, 78% of local mobile searches lead to an offline purchase \u2014 so absence = invisible at the exact moment of decision",
+    "evidence": "BizIQ's 2026 local search statistics roundup compiles these with sources (98% search online, 46% of Google searches have local intent, near-me growth 900% in 2 years, 76% visit within 24h per Google, 28% purchase per Think with Google, 78% offline purchase per SEMrush); MyBizGrade's data from 2,800+ businesses converts this into annual costs (no GBP optimization \u2248 -$30K, page-2 rankings \u2248 -$78K, 3.5 vs 4.5 stars \u2248 -$35K)",
+    "source": "https://biziq.com/blog/local-search-statistics/"
+   },
+   {
+    "tactic": "One-page scorecard design: LEAD with the letter-grade sheet (A-F per category) at the top \u2014 grades create curiosity without explanation; make each grade drill down (in the full doc) to specific issues with severity indicators; always anchor grades to dollars ('Your visibility grade is a D \u2014 that's roughly $8-15K/month in leads going to competitors'); validate one strength before the gaps; and never present a grade without naming the data behind it",
+    "evidence": "GoHighLevel's grading-sheet playbook: 'You're not burying the summary; you're leading with it... Send it to a cold prospect with zero context and the grades themselves create curiosity. A D in SEO makes them want to know why \u2014 and that's your opening'; 'Anchor grades to revenue impact \u2014 a grade by itself is abstract'; 'Show the range... validates what they're doing well while opening the door'; 'frame low scores as opportunities, not failures.' Its actual rubric: 5 equal sections (Business Details, Reviews, SEO, Website, Listings, 20% each), 5-color scale (dark red 0-20% \u2192 dark green 81-100%), review-reply-rate banded 0-10/11-49/50-89/90-100%, and a 9-point geo-grid where the center point is worth 20%",
+    "source": "https://globalhighlevel.com/blog/how-to-use-grading-sheets-in-gohighlevel-audit-reports/"
+   },
+   {
+    "tactic": "What to KEEP on the condensed one-pager: overall 0-100 score or letter grade, a competitor comparison table (you vs the 3 pack winners: reviews, rating, photos, AI mentions), ONE visual (geo-grid heat map or review-gap bar), 3-5 prioritized quick wins with severity colors (Red/Amber/Green), and 3 'do this next' actions sized for 7/30/90 days. What to CUT: methodology, jargon, exhaustive checklists, mid-grade passing items, and more than one CTA",
+    "evidence": "Mudassir Fazal's audit-lead-magnet playbook specifies the converting deliverable as '1-page Scorecard (0-100) + 3-5 prioritized quick wins' with Red 0-49/Amber 50-74/Green 75-100 tiers and 'always include 3 do-this-next actions sized for 7, 30, and 90 days'; Vouch Local's Client Acquisition Audit (agencies report closing 30-50% of pitched prospects) is 'visual-first with KPI tiles, charts, and a rank-by-grid heat map... easy to skim, hard to argue with, designed for non-SEO audiences' ending in a 30-60-90 day plan; the GTM scorecard framework: a premium scorecard states 'what is wrong, why it matters, what it is costing them, what to fix first, what happens if they ignore it' \u2014 each finding = issue + risk + business impact + fix + priority",
+    "source": "https://medium.com/@mudassirfazal432/the-free-digital-marketing-audit-your-highest-roi-lead-magnet-in-2025-4549ce7571c0"
+   },
+   {
+    "tactic": "Tone pattern for the pitch-adjacent scorecard: opportunity framing over criticism \u2014 validate what's working first, limit to 3 priorities (not 20 recommendations), connect every finding to a business outcome, and sell only the single highest-impact fix first (the rest become the upsell ladder)",
+    "evidence": "Sugarpunch's converting-audit framework: 'Criticism creates defensiveness. Understanding combined with clear pathways forward creates collaboration... provide three clear priorities that create momentum' and rewrite findings as opportunity ('Current engagement patterns suggest room for optimization' vs 'your engagement is low'); GoHighLevel: 'Don't oversell. If their grades show they need SEO work but their website is also a disaster, you could sell three services. Don't. Pick the highest-impact area first... Schedule a follow-up audit in 90 days \u2014 a natural upsell moment'",
+    "source": "https://sugarpunchmarketing.com/social-media-management/social-media-audit-template-8-step-framework-that-converts-prospects/"
+   },
+   {
+    "tactic": "Structure the no-website presence audit as 5-7 equal-weight sections so 'no website' is one failing row among several fixable ones, not the whole story: Business Details, GBP, Listings/NAP, Online Reputation, Local Rank (geo-grid), AI Visibility, and Website (graded F/absent \u2014 which itself sells the spec site)",
+    "evidence": "CORE CONNECT's prospecting Marketing Audit uses 7 equally weighted sections (Business Details, TechnoStack, GBP, Listings, Online Reputation, Website Performance, SEO geo-grid), each 1/7 of the overall score, with GBP scored on 5 fields at 20% each (address, website link, photos, hours, phone) and review reliability discounted by volume (50+ reviews = 100% reliability, <5 = 30%) \u2014 a ready-made pattern for scoring a business whose 'website' row simply scores zero while everything else stays actionable",
+    "source": "https://coreconnect.com/docs/prospecting/how-to-generate-a-marketing-audit-report-for-a-prospect/"
+   }
+  ],
+  "pitfalls": [
+   "Arbitrary or unexplainable grades: if the owner (or their nephew who 'knows computers') asks why they got a D, you must be able to name the threshold (e.g., 'full photo credit at 10+, you have 3'). Publish/borrow real weights (rank.ai, GoHighLevel) rather than vibes-scoring.",
+   "Penalizing what you couldn't measure: when a data source doesn't return photos/posts/Q&A, mark the category 'ungraded' and re-weight the rest (rank.ai pattern) \u2014 a false F discovered by the prospect kills all credibility.",
+   "Comparing to scary national benchmarks instead of the prospect's actual pack: the realistic target is the weakest of the 3 businesses in THEIR local pack (median just 20 reviews in the Get Found Guy study). Inflated targets read as fear-mongering and are checkable.",
+   "AI-visibility results fluctuate daily \u2014 a single snapshot can be wrong tomorrow. Run each prompt more than once, screenshot with date/prompt visible, and phrase findings as 'in our July 2026 tests' rather than absolutes (Veza Digital's critique of snapshot audits).",
+   "Criticism framing creates defensiveness: leading with 'everything is broken' makes owners defensive; validate one genuine strength (e.g., strong star rating) before the gaps, and frame every red item as recoverable revenue.",
+   "Overloading the one-pager: more than ~5 findings, any methodology text, or multiple CTAs dilutes it. The one-pager's only job is grade \u2192 gap vs competitors \u2192 dollars \u2192 one next step; the full PDF carries the detail.",
+   "Overselling in the report: pitching websites + automations + voice agents + UltraPlan simultaneously reads as a menu, not a diagnosis. The scorecard should point to ONE highest-impact fix; the 90-day re-audit is the built-in upsell moment.",
+   "Generic canned audits and slow delivery: identical boilerplate with no business-specific screenshots, or delivery >7 days after first contact, are the two most-cited reasons audit lead magnets fail to convert.",
+   "Legal/accuracy exposure on dollar claims: revenue-loss figures (e.g., $1,200/missed call, $17K/yr) come from vendor content with varying rigor \u2014 present them as 'industry estimates' with visible sourcing and show the formula with the prospect's own numbers, never as a measured fact about their business.",
+   "The 62% missed-call stat traces to a 2016 study of 85 businesses (411 Locals) \u2014 it's directionally useful and universally cited, but pair it with the prospect-specific observable (e.g., 'we called you Tuesday 2pm, no answer, voicemail full') for credibility."
+  ],
+  "sources": [
+   "https://www.leadoracle.ai/blog/how-to-audit-client-gbp",
+   "https://www.rank.ai/gbp-audit",
+   "https://storefrontaudit.com/blog/how-to-audit-google-business-profile",
+   "https://localauditpro.com/google-business-profile-audit-checklist",
+   "https://www.swydo.com/blog/google-business-profile-audits/",
+   "https://dreamwarrior.com/blog/google-business-profile-audit-guide/",
+   "https://www.brightlocal.com/agencies/",
+   "https://www.brightlocal.com/resources/top-brightlocal-resources-tools-and-tips-for-agencies/",
+   "https://www.brightlocal.com/research/lcrs-ai-trust/",
+   "https://www.brightlocal.com/research/local-consumer-review-survey/",
+   "https://getlocalvitals.com/",
+   "https://harrisandward.com/ai-visibility-audit/",
+   "https://aivisitaudit.com/",
+   "https://avantevisibility.com/ai-visibility-audit",
+   "https://asceroai.com/ai-visibility-audit",
+   "https://www.vezadigital.com/services/ai-search-visibility-audit",
+   "https://www.localfalcon.com/blog/whitepaper-google-reviews-ratings--location-what-50-million-search-results-reveal-about-ranking-in-the-local-3pack",
+   "https://www.getfoundguy.com/blog/google-reviews-to-rank-map-pack/",
+   "https://locafy.com/blog/local-3-pack-vs-organic",
+   "https://spartansem.com/map-pack-vs-organic-results-which-drives-more-leads/",
+   "https://owlclaw.com/benchmarks/local-seo-benchmarks/",
+   "https://globalhighlevel.com/blog/how-to-use-grading-sheets-in-gohighlevel-audit-reports/",
+   "https://help.gohighlevel.com/support/solutions/articles/155000003125-understanding-the-grades-in-your-marketing-audit-report",
+   "https://coreconnect.com/docs/prospecting/how-to-generate-a-marketing-audit-report-for-a-prospect/",
+   "https://medium.com/@mudassirfazal432/the-free-digital-marketing-audit-your-highest-roi-lead-magnet-in-2025-4549ce7571c0",
+   "https://sugarpunchmarketing.com/social-media-management/social-media-audit-template-8-step-framework-that-converts-prospects/",
+   "https://www.linkedin.com/pulse/gtm-audit-scorecard-passfail-checklist-clients-pay-margub-alam-qvbuc",
+   "https://vouchlocal.ai/features/reports",
+   "https://411locals.us/small-business-owners-dont-answer-62-of-phone-calls/",
+   "https://www.hicira.com/missed-call-statistics",
+   "https://usegreet.com/blog/cost-of-missed-calls",
+   "https://zadarma.com/en/blog/missed-calls-cost-research/",
+   "https://leadsagent.io/blog/businesses-without-website-statistics",
+   "https://atomixdigital.com/blog/website-for-local-business-vs-no-website",
+   "https://biziq.com/blog/local-search-statistics/",
+   "https://www.mybizgrade.com/blog/cost-of-ignoring-online-presence",
+   "https://b2bleadfinder.io/blog/businesses-without-websites-2026",
+   "https://webzum.com/blog/do-you-need-a-website-small-business-2026"
+  ]
+ },
+ "v2:658adbbb71bcb41e2d2861833cb8a20da79b8397866425bfa71a3fba6d599590": {
+  "summary": "For micro-SMB owner-operators with no website (like Tampa Bay pool companies), the evidence strongly favors phone-first outreach \u2014 owners answer their own phones at 30-50% rates from Google Maps numbers vs under 2% cold-email reply, and email works best as the follow-up channel that delivers the \"we built you something\" deliverable (audit PDF / spec site) between the first call and the callback. Fresh sending identities need a 2-4 week warm-up starting at 5-10 emails/day ramping to 20-50 cold sends per inbox per day max, with warm-up left running permanently and hard tripwires at 0.1% spam complaints and 2% bounces. The 2025-26 AI-SDR shakeout shows fully-autonomous pipelines die from deliverability collapse, hallucinated personalization (12-20% of AI emails contain a false company-specific claim), and stale data \u2014 the surviving pattern is agent-assisted: AI does discovery, enrichment, drafting, and reply classification; humans keep list/ICP curation, a review gate on the first ~100 sends, all reply handling within hours, and a kill switch. For calls, TCPA makes manual human dialing to verified business lines the only safe cold channel \u2014 no autodialers or AI voice to cell phones without prior express written consent.",
+  "tactics": [
+   {
+    "tactic": "Go phone-first for no-website local businesses; use email only as the follow-up/evidence channel",
+    "evidence": "For web agencies targeting local trades, cold calls to Google Maps-verified numbers get 30-50% answer rates during business hours vs under 2% reply on cold email; owners answer their own phones with no gatekeeper, and the highest-value email is the audit PDF sent AFTER a phone contact, before the scheduled callback \u2014 it gets opened because the prospect expects it. The 'no website yet' observation lands naturally live on a call but 'can feel surveillance-like' arriving cold in writing.",
+    "source": "https://getmapleads.io/blog/cold-email-vs-cold-calling-web-design-agencies"
+   },
+   {
+    "tactic": "Reserve email-first for buyers who live in their inbox (B2B/commercial side), not owner-operators",
+    "evidence": "A controlled 30-day split test for a commercial cleaning company (same list, same offer) had email slightly beat calling (14 vs 11 qualified leads, 2 vs 1 closed) \u2014 but the targets were facility managers/property managers who read email daily. The channel verdict flips by persona: inbox-native buyers \u2192 email scales cheaper; trades owners on job sites \u2192 phone. Run both if possible since some prospects only respond to one.",
+    "source": "https://elevateclientsinc.com/resources/cold-email-vs-cold-calling-commercial-cleaning"
+   },
+   {
+    "tactic": "Warm a fresh sending identity 2-4 weeks minimum on a dedicated lookalike domain before any cold send",
+    "evidence": "Start at 5-10 warm-up emails/day, increase ~10-20%/never more than ~20%/day, reaching 30-50/day by weeks 3-4; new domains need at least 30 days before campaign sends; SPF/DKIM/DMARC first, human From-name (not info@/sales@), tracking pixels off early. Keep warm-up running indefinitely alongside campaigns \u2014 teams that turn it off see deliverability erode within 6-8 weeks.",
+    "source": "https://www.smartlead.ai/blog/email-warm-up-guide"
+   },
+   {
+    "tactic": "Cap cold volume at 20-50 emails per inbox per day; scale with more inboxes, not bigger sends",
+    "evidence": "Instantly's scaling guidance: first-week range 20-30 total emails/inbox/day, keep total under 50/inbox in the first two weeks, use 2-5 inboxes per domain and rotate; hold spam complaints under 0.3% (target 0.1%), hard bounces at or below 1-2%, and if placement drops cut daily caps 30-50% and re-verify the list. A common steady-state split is ~30 campaign + 10 warm-up emails per account per day.",
+    "source": "https://instantly.ai/blog/scaling-email-warm-up/"
+   },
+   {
+    "tactic": "Call trades/service owners 7:00-8:30 AM (before they roll to job sites) and 4:30-6:00 PM (wrap-up), Tue-Thu",
+    "evidence": "MapsLeads dialer data: local-service owners (plumbing, HVAC, pools, construction) are on-site by 9:00, so the windows are 7:00-8:30 AM and 4:30-6:00 PM local \u2014 different from the generic B2B 8-10 AM / 4-5 PM windows; local-services dialing from Maps-sourced lists hits 15-25% connect rates when timed right. Wednesday runs ~1.4x weekly-average connects; Monday morning and Friday afternoon are dead. Contractor inbound data confirms their phones are busiest 7-9 AM and 4-6 PM, i.e., they're AT the phone then.",
+    "source": "https://www.mapsleads.co/blog/cold-calling-best-time-of-day"
+   },
+   {
+    "tactic": "Design the CRM call queue around windows and tiers: best leads into best windows, admin into dead slots",
+    "evidence": "The data-backed weekly template: Monday = list building/data verification/light warm follow-ups after 3 PM; Tue = tier-2 dials; Wed = tier-1 dream accounts; Thu = dials + follow-ups; Friday morning only = pipeline cleanup and warm callbacks. Sort the queue by the prospect's local time zone, cut slots that book nothing across ~80 dials, and treat wrong numbers as a list problem, not a timing problem.",
+    "source": "https://tomba.io/blog/best-day-to-cold-call"
+   },
+   {
+    "tactic": "Flag positive email replies as immediate-call tasks \u2014 pick up the phone within minutes, not email back",
+    "evidence": "A home-services cold-email operator (landed $60k commercial deals): 'if someone emails back yes, I'm interested, you pick up the phone, call them right then... that's how you convert way more of those leads.' A commercial HVAC case study found replies going stale because the salesperson checked email sporadically between site visits; routing positive replies to a monitored shared inbox with same-day callbacks recovered slipping estimates. 33% of all responses arrive within 24 hours of a touch.",
+    "source": "https://readtheworkbench.com/p/how-cold-email-landed-60k-home-service-deals"
+   },
+   {
+    "tactic": "For SMB offers, run a tight 3-4 touch sequence with graduated spacing and a breakup email \u2014 not 7+ touches",
+    "evidence": "A 15,000-sequence study: steps 1-3 capture 73.6% of all replies; optimal default is 4 steps with graduated timing (Day 1, Day 4, Day 9-10, Day 17-20 breakup) yielding ~15.1% cumulative reply with complaints under 0.35%; 2-day spacing produced 46% more spam complaints than 3-4 day spacing for no significant reply gain; the breakup email has the highest positive-reply ratio of any follow-up position. SMB/transactional segment guidance converges on 3-4 follow-ups over 10-14 days.",
+    "source": "https://warmysender.com/blog/posts/multi-step-email-sequence-benchmarks-follow-up-study"
+   },
+   {
+    "tactic": "Make each 'we built you something' touch add a new concrete angle, with a low-friction physical/tangible CTA",
+    "evidence": "A commercial HVAC contractor's 4-email cadence (signal-based opener \u2192 local proof point \u2192 case with real numbers \u2192 breakup) hit 8.3% reply / 46% positive and $480K closed in 90 days; stripping company credentials and opening with the prospect's own building doubled replies (4.1%\u21928%), and swapping the 'meeting ask' CTA for a free on-site assessment roughly doubled bookings. The free deliverable/assessment IS the conversion event for service-business outbound \u2014 a direct analogue to a free audit report card or spec website.",
+    "source": "https://growtoro.com/blog/local-services-company-lead-gen-case-study"
+   },
+   {
+    "tactic": "Expect 4.8 touches to first response and 7.4 to a booked meeting; mix channels",
+    "evidence": "Outreach's 2026 Icebox report: average touches to first response climbed from 3.2 (2022) to 4.8; booking a meeting averages 7.4 touches; multi-channel sequences reply at 7% vs 5% email-only; 4-6 step sequences outperform 1-3 step ones; 62% of responses come within the first week \u2014 so persistence should be spread across call + voicemail + email, not stacked in one inbox.",
+    "source": "https://www.outreach.ai/resources/blog/the-icebox-the-inside-scoop-on-cold-calling-and-emailing"
+   },
+   {
+    "tactic": "Build the agent pipeline as 7 layers with an explicit human-approval gate: ingest \u2192 enrich \u2192 research \u2192 generate \u2192 HITL review \u2192 send \u2192 reply-classify",
+    "evidence": "The n8n AI-SDR reference build routes every generated email through a Slack 'Send and Wait for Approval' node for the first 100 sends; autonomy is only granted after the first 100 clear with under 5% rejection, then a 10% rolling daily spot-check continues. Research agents output a do_not_contact_reason guardrail field (competitor/current customer/recent layoff \u2192 skip), copy passes a banned-phrase regex, sends cap at 40-50/day/mailbox on warmed inboxes, and replies are classified into 5 buckets (interested/objection/unsubscribe/OOO/wrong-person) each triggering a different action.",
+    "source": "https://techsy.io/en/blog/how-to-build-ai-sdr-with-n8n"
+   },
+   {
+    "tactic": "Use Clay-style waterfall enrichment + LLM ICP scoring to gate who ever enters a sequence",
+    "evidence": "A working Clay+n8n+Claude stack (~$47-280/month) runs cheapest-first enrichment waterfall (Hunter \u2192 PDL \u2192 RocketReach), scores every contact 1-10 with Claude Haiku against explicit ICP criteria, and only routes score \u22657 with verified email to the sender \u2014 about 38% of enriched contacts pass, deliberately, because 'high-volume outreach to weak-fit contacts hurts deliverability and wastes sequence capacity.' n8n dedupes against the CRM before pushing to Smartlead and logs score + trigger per contact.",
+    "source": "https://dev.to/zackrag/build-your-own-ai-prospecting-agent-for-under-50month-a-step-by-step-walkthrough-with-clay-n8n-377g"
+   },
+   {
+    "tactic": "Automate the safety rails: quarantine dirty rows, auto-pause campaigns on bounce spikes, close the status loop to the CRM",
+    "evidence": "The Clay\u2192n8n\u2192Smartlead production pattern: only push batches at \u226580% enrichment-complete, route malformed/incomplete records to a Slack-flagged quarantine for manual review (they often carry the highest intent), poll sender status every 4 hours writing REPLIED/BOUNCED back to the CRM, auto re-enrich hard bounces via an alternate waterfall source, and enforce a hard rule that auto-pauses any campaign whose bounce rate exceeds 3%.",
+    "source": "https://theautomationsguide.com/blog/2026-05-07-clay-smartlead-n8n-cold-email-automation-stack/"
+   },
+   {
+    "tactic": "Keep humans owning: ICP/list curation, first-N send review, all reply conversations, and the kill switch",
+    "evidence": "The 2025 'AI SDR dream' collapsed into agent-assisted as the surviving model: AI does research, enrichment, list-building, drafting; a human reviews before anything sends. Procurement-grade controls that emerged from the cancellation wave: manual review queue on the first 1,000 sends of any new persona, a kill switch triggerable in under 60 seconds, hallucination audit on a 100-target held-out set (refuse >5%), and volume capped at human-led levels regardless of vendor claims. The reply is the highest-value moment \u2014 systems that automate sending but lose replies in an unmonitored queue destroy mid-funnel conversion.",
+    "source": "https://www.lusha.com/blog/why-the-ai-sdr-dream-failed/"
+   },
+   {
+    "tactic": "For calls: manual human dialing to verified business lines only; scrub DNC every 31 days; 8am-9pm local window",
+    "evidence": "Live, manually dialed calls to business landlines need no prior consent and most B2B calls are exempt from the federal DNC registry \u2014 but there is NO B2B carve-out for cell phones: autodialed, prerecorded, or AI-voice calls to any mobile require prior express written consent ($500-1,500 per call statutory damages; FCC's Feb 2024 ruling classifies AI voices as 'artificial'). Florida's mini-TCPA is stricter than federal (8am-8pm, broad autodialer definition, private right of action) \u2014 directly relevant to Tampa Bay dialing. Honor any opt-out within 10 business days by any reasonable means (April 2025 FCC rule).",
+    "source": "https://www.leadium.com/blog/cold-calling-laws"
+   },
+   {
+    "tactic": "Never cold-email homeowners/residential; keep the automated wedge strictly business-to-business",
+    "evidence": "Cold email to homeowners produces sub-0.5% response and a meaningful spam-complaint share that bleeds into your transactional email (confirmations, invoices) and 'trains your local market to associate your brand with junk mail.' It also warns that if the owner answers the phone and runs the schedule, outbound replies will sit unanswered for days \u2014 build a 15-min/day reply-response process before sending anything.",
+    "source": "https://eliteaiadvantage.com/white-papers/ai-cold-outbound-service-businesses-when-it-works"
+   }
+  ],
+  "pitfalls": [
+   "Deliverability collapse from volume spikes: AI-SDR programs ramping past warm-up curves show a median \u221238 point sender-reputation drop within 90 days; Gmail blocks domains at 0.3% spam-complaint rate (intervene at 0.05-0.1% in Postmaster Tools), and the failure shows a predictable arc \u2014 clean week 1, complaints tick up week 2, inbox placement under 60% by week 4 (digitalapplied.com, firstsales.io, leadgen-economy.com)",
+   "Wrong-business embarrassment / hallucinated personalization: audited AI-SDR tools showed 12-20% of generated emails containing at least one false company-specific claim (fake funding rounds, sunset product lines, former employees); one hallucinated compliment screenshot got 4,000 LinkedIn reactions and cost the vendor a customer within 48 hours \u2014 every wrong send is a potential screenshot carrying your brand (leadgen-economy.com)",
+   "Stale data is the dominant root cause, not copy: LinkedIn titles are stale by a median of 7 months, intent data runs 30-47% false-positive, and standard databases (Apollo/ZoomInfo/Clay) have only 10-20% decision-maker coverage with degraded email accuracy for local trades \u2014 for local outbound the fix is discovery from Google Maps + state business registries to get owner@ contacts, not more enrichment (datalane.com, readtheworkbench.com)",
+   "Sending cold email from the main business domain \u2014 one campaign gone wrong poisons transactional email and the brand; always use dedicated lookalike sending domains",
+   "Turning warm-up off after launch: deliverability degrades within 6-8 weeks; warm-up is permanent reputation maintenance, kept at 20-30% of daily campaign volume (smartlead.ai)",
+   "The reply-handling gap: automating sends while replies sit for 3+ days (owner on a job site, agency scope that excludes reply triage) \u2014 'by day four the prospect has hired the competitor who picked up the phone'; every outsourced program that breaks, breaks at the reply handoff (eliteaiadvantage.com, gtmlens.com)",
+   "Over-long, uniform sequences: touches 5-7 add only ~4.6 points of mostly-negative replies while pushing spam complaints past 0.5%; template-identical structure at machine cadence is exactly what ESP pattern-detection flags, and recipients pattern-match the AI voice \u2014 reply rates on agentic outbound cohorts decay 60%+ within 18 months (warmysender.com, firstsales.io, digitalapplied.com)",
+   "Using AI voice agents or autodialers for cold calls to cell phones: prior express written consent is required regardless of business use \u2014 $500-1,500 per call, TCPA class actions up ~95% H1 2025; ironically GAELWORX can sell AI voice agents for INBOUND answering (legal, high value for trades missing 23% of after-hours calls) while never using them for cold outbound (avair.ai, leadium.com, calljolt.com)",
+   "CRM pollution from autonomous agents: ghost activity, logged calls to disconnected numbers, and phantom pipeline from LLMs misreading polite brush-offs ('circling back') as positive intent \u2014 gate 'interested' classifications with human confirmation before they become meetings (lusha.com, everworker.ai)",
+   "Leading with the 'I noticed you have no website' observation in a cold EMAIL feels surveillance-like and creepy; the same line works naturally live on a phone call \u2014 channel choice changes whether personalization reads as helpful or invasive (getmapleads.io)",
+   "Skipping email verification: three hard bounces can flag a domain; verify every address (ZeroBounce/NeverBounce-class) after qualification but before send, and treat catch-alls separately (thesixfigureconsulting.com, gtmlens.com)",
+   "Measuring inputs (sends, opens) instead of outputs (qualified conversations, booked walkthroughs/estimates, revenue) \u2014 open rate is inflated and a vanity metric; a campaign with strong opens and weak replies is failing (onyxsend.com, rhinoagents.com)"
+  ],
+  "sources": [
+   "https://getmapleads.io/blog/cold-email-vs-cold-calling-web-design-agencies",
+   "https://elevateclientsinc.com/resources/cold-email-vs-cold-calling-commercial-cleaning",
+   "https://eliteaiadvantage.com/white-papers/ai-cold-outbound-service-businesses-when-it-works",
+   "https://www.smartlead.ai/blog/email-warm-up-guide",
+   "https://instantly.ai/blog/scaling-email-warm-up/",
+   "https://alchemail.io/blog/email-warmup-guide",
+   "https://www.mapsleads.co/blog/cold-calling-best-time-of-day",
+   "https://calljolt.com/blog/guide/peak-call-time-analysis-contractors",
+   "https://tomba.io/blog/best-day-to-cold-call",
+   "https://warmysender.com/blog/posts/multi-step-email-sequence-benchmarks-follow-up-study",
+   "https://www.datalane.com/post/cold-email-follow-ups",
+   "https://www.outreach.ai/resources/blog/the-icebox-the-inside-scoop-on-cold-calling-and-emailing",
+   "https://growtoro.com/blog/local-services-company-lead-gen-case-study",
+   "https://readtheworkbench.com/p/how-cold-email-landed-60k-home-service-deals",
+   "https://www.leadgen-economy.com/blog/ai-sdr-cancellation-wave-failure-forensics/",
+   "https://www.lusha.com/blog/why-the-ai-sdr-dream-failed/",
+   "https://gtmlens.com/bp-why-ai-sdrs-fail-three-patterns/",
+   "https://firstsales.io/blog/why-ai-sdrs-get-blocked/",
+   "https://www.digitalapplied.com/blog/case-against-ai-sdrs-contrarian-analysis-2026",
+   "https://techsy.io/en/blog/how-to-build-ai-sdr-with-n8n",
+   "https://dev.to/zackrag/build-your-own-ai-prospecting-agent-for-under-50month-a-step-by-step-walkthrough-with-clay-n8n-377g",
+   "https://theautomationsguide.com/blog/2026-05-07-clay-smartlead-n8n-cold-email-automation-stack/",
+   "https://www.leadium.com/blog/cold-calling-laws",
+   "https://alexberman.com/b2b-cold-calling-laws",
+   "https://www.avair.ai/resources/blog/tcpa-compliance-checklist-b2b-sales-teams",
+   "https://www.everworker.ai/blog/ai_sdr_pipeline_risks_and_mitigation"
+  ]
+ },
+ "v2:914d4406c0ed44b9fa1e65eb9cf662cb0dcbd6eac243ecf443e9c9e2b507d09c": {
+  "summary": "Verified from live tool schemas: the clear #1 path is mcp__Vercel__deploy_to_vercel \u2014 it takes an inline files[] tree (utf-8 or base64 for binary assets), auto-creates a project per `name` (so one project per lead slug), needs no git repo or build step, and with target:\"production\" yields a stable public https://<slug>.vercel.app URL per lead; use target:\"production\", NOT \"preview\" (previews can sit behind deployment protection \u2014 the companion get_access_to_vercel_url tool exists precisely to mint 23-hour auth-bypass links for 403'd URLs, which are useless for outreach). Spot-check the first deployed URL with an unauthenticated fetch; if it 403s, deployment protection must be disabled on the project (dashboard/API \u2014 not exposed via this MCP). #2 fallback is mcp__Supabase__deploy_edge_function with verify_jwt:false \u2014 one edge function per lead (or one router function keyed on path) serving text/html at https://<project-ref>.supabase.co/functions/v1/<slug>; fully headless via a single MCP call per lead, but it is serverless code rather than static hosting, the URL carries /functions/v1/, and the schema defaults verify_jwt to true with strong warnings (public lead pages require it false). Ruled out by schema inspection: Cloudflare MCP has no content-write path at all (workers tools are read-only list/get/get_code \u2014 no deploy; R2 tools manage buckets only with no object upload or public-access toggle; KV has namespace CRUD but no key writes); Higgsfield create_website scaffolds a full React 19 + TanStack Start SSR app requiring git clone/commit/push + CI per site, its `type` param mandates asking the user interactively, and hosting lives on Higgsfield's consumer AI platform domain \u2014 massively heavyweight and off-brand for 10-50 professional one-pagers; Google Drive create_file can store text/html but Drive serves preview/download UI, never rendered HTML (hosting discontinued 2016); n8n offers no static hosting (a webhook-returning-HTML workflow would give an ugly /webhook/ URL and consume an execution per page view). Previously confirmed: GitHub raw URLs serve text/plain; Lovable OAuth impossible headlessly.",
+  "options": [
+   {
+    "name": "mcp__Vercel__deploy_to_vercel",
+    "capability": "Deploys an inline file tree (files[]: {file, data, encoding: utf-8|base64}) directly to a Vercel project with no git repo or CLI; required `name` param auto-creates the project if it doesn't exist; required `target` is \"preview\" or \"production\"; optional projectSettings to override framework auto-detection; optional teamId (discover via list_teams).",
+    "fit": "Best fit (rank #1). Exactly matches the requirement: per-lead project via unique `name` slug -> stable https://<slug>.vercel.app production URL; plain HTML/CSS/assets deploy as static files with zero build step (binary assets via base64 encoding); repeat deploys to the same name update the same URL. 10-50 projects is well within plan limits.",
+    "caveats": "Must use target:\"production\" \u2014 preview URLs can 403 behind Vercel deployment protection (the sibling tool get_access_to_vercel_url exists to mint auth-bypass links that expire in 23 hours, unusable for lead outreach). If the exact project name is globally taken on vercel.app, the assigned domain may get a suffix \u2014 verify the returned URL from the deploy response (or get_deployment) rather than assuming <slug>.vercel.app. teamId may be required depending on account; get it from list_teams. After the first deploy, fetch the URL unauthenticated to confirm it's public; if 403, protection must be disabled in the Vercel dashboard (not exposed via this MCP). Hobby plan caps ~100 deployments/day \u2014 fine for 10-50 sites."
+   },
+   {
+    "name": "mcp__Supabase__deploy_edge_function",
+    "capability": "Deploys a Deno edge function from an inline files[] array to a Supabase project (creates a new version if it exists); params: project_id, name, entrypoint_path, verify_jwt, files; function can return any Response including Content-Type: text/html.",
+    "fit": "Viable fallback (rank #2). One function per lead slug (or a single router function switching on URL path) serving the one-page HTML at https://<project-ref>.supabase.co/functions/v1/<slug>. Fully headless \u2014 single MCP call per lead, no git, no build. Get the base URL via mcp__Supabase__get_project_url.",
+    "caveats": "Not static hosting \u2014 it's serverless code with HTML embedded in the function body; large inline assets bloat the function (prefer external/base64-inlined small assets). verify_jwt defaults to true and the schema warns to keep it enabled \u2014 public lead pages REQUIRE verify_jwt:false, which the schema permits when the user explicitly requests it; confirm this choice with the user. URL is less clean (<ref>.supabase.co/functions/v1/<slug>), cold starts add latency, and per-project function count/size limits apply (fine at 10-50)."
+   },
+   {
+    "name": "mcp__higgsfield__create_website (+ get_website_creation_instructions, website_repo_access, deploy_website, publish_website, list_websites)",
+    "capability": "Scaffolds a full-stack React 19 + TanStack Start server-rendered app in one Cloudflare Worker from a git template; subdomain param sets <subdomain>.<host> URL; requires reading get_website_creation_instructions first, then git clone/edit/commit/push via website_repo_access, then deploy_website runs a CI build; publish_website only lists the live site on the Higgsfield community feed (it does not deploy).",
+    "fit": "Poor fit despite slug-style URLs. It builds SSR web apps, not static pages: 10-50 leads means 10-50 git repos + CI builds, the `type` param explicitly requires asking the user interactively before creating, and hosting is on Higgsfield's consumer AI-creative platform domain \u2014 off-brand for a professional business one-pager.",
+    "caveats": "Heavy per-site workflow (repo clone/commit/push + CI per lead); the required `type` choice blocks fully headless operation; final host domain is Higgsfield's, not neutral; publish_website drags sites onto a public community feed, which is undesirable for private lead-specific pages."
+   },
+   {
+    "name": "mcp__Cloudflare_Developer_Platform__* (workers_list/get_worker/get_worker_code, r2_bucket_create/get/delete, kv_namespace_*)",
+    "capability": "Read-only for Workers (list, get details, get code \u2014 there is NO deploy/put-code tool on this server); R2 tools manage buckets only (create takes just `name`; no object-upload tool, no public-access/custom-domain toggle); KV tools do namespace CRUD only (no key-value write tool).",
+    "fit": "Dead end \u2014 confirmed by schema inspection. No tool on this MCP server can upload HTML content or deploy worker code, so neither a per-lead worker nor an R2-served static page can be created through it.",
+    "caveats": "Would require wrangler CLI + Cloudflare API token outside MCP, which is not configured in this session. The migrate_pages_to_workers_guide and search_cloudflare_documentation tools are informational only."
+   },
+   {
+    "name": "mcp__Google_Drive__create_file",
+    "capability": "Uploads a file to Drive (textContent or base64Content, contentMimeType required; disableConversionToGoogleType:true keeps text/html from being converted to a Google Doc). Returns a File object.",
+    "fit": "Not viable for hosting. Drive stores the HTML file but serves it through a preview/download UI \u2014 it never renders as a hosted web page (Drive web hosting was discontinued in 2016). A lead clicking the link sees raw file preview chrome, not the site.",
+    "caveats": "Also requires a separate permissions step to make the file link-shareable; even then the result is a file viewer, not a website."
+   },
+   {
+    "name": "n8n tools (create_workflow_from_code, publish_workflow, data tables)",
+    "capability": "Builds and publishes n8n automation workflows; a Webhook-trigger workflow can technically return an HTML response body at the instance's /webhook/<path> URL. No static hosting or file-serving tools exist.",
+    "fit": "Not suitable. The URL is an unbranded n8n webhook path, every page view consumes a workflow execution, and availability depends on the workflow staying published on the n8n instance \u2014 the opposite of stable static hosting.",
+    "caveats": "Only worth considering if literally nothing else existed; Vercel and Supabase paths above are strictly better."
+   }
+  ]
+ },
+ "v2:6a2e340356b579213f1028360338f0cc104c6026b7db1988d3af7975e7e8e3c0": {
+  "gaps": [
+   "No Tampa Bay TAM count for the NO-SITE segment. The research cites generic '20-40% of local businesses have no website' vendor stats, but nobody ran the actual scrape: how many operational, 20+-recent-review, no-website pool companies exist in the metro? The repo's own pool-leads.jsonl suggests the segment is thin \u2014 only ~2 of 17 scraped small pool operators lack a site (one is Facebook-only). If qualified inventory is 30 businesses, a full autonomous pipeline is over-engineering; a weekend of manual work covers it. This number should be established before any build.",
+   "Email fill-rate for this exact segment was never measured, and current data predicts it is near zero: all 17 pool leads in data/pool-leads.jsonl have email:null, and the research itself says GBP never exposes emails, trades have the lowest match rates, and Facebook-About is a stale fallback. The plan's happy path ('email it if email found') may fire on 10-20% of leads at best \u2014 meaning Pipeline B is structurally a CALLING pipeline, yet the plan has no researched call scripts adapted for GAELWORX, no call capacity/owner, no callback-scheduling step, and no answer to who dials the 'flagged for owner to CALL' CRM records.",
+   "Spec-site hosting architecture is undecided and the current hosting mechanism cannot serve it: PDFs are hosted via raw.githubusercontent.com on a work branch (URLs break after merge, per HANDOFF.md), and raw GitHub serves HTML as text/plain \u2014 it cannot host a live spec website. Nothing was decided on previews subdomain vs Vercel, per-prospect tracking URLs, layered noindex+robots+password protection, automated 7-day expiry/teardown, or a takedown process \u2014 all of which the research flags as mandatory hygiene.",
+   "Sunbiz automation feasibility was not established: the research covers what Sunbiz contains but not whether search.sunbiz.org tolerates programmatic queries (rate limits, CAPTCHA) or that Florida publishes bulk corporate data files that could replace scraping entirely. Nor is there a matching algorithm for the known DBA/fictitious-name mismatch problem \u2014 no precision estimate for entity-name matching means unknown risk of personalizing with the WRONG owner's name, which is worse than no name.",
+   "Cold-calling legal exposure was not researched at all. CAN-SPAM (email) and TCPA-for-texting were covered, but Pipeline B's dominant channel is the phone: Florida's Telephone Solicitation Act (private right of action, autodialer definitions), federal/Florida DNC registries, and the fact that solo-operator 'business' numbers are usually personal cell phones. The plan needs a DNC-scrub and manual-dial policy before the CALL flag is exercised.",
+   "No defensible data source for the presence report card's dollar-anchored claims ('searches/month x avg job value' revenue leak, $1,200/missed call). The repo's own hard rule is 'never fabricate a score, review, competitor, stat' \u2014 but no Tampa pool-service search-volume or job-value source was identified, so the report card's strongest lever currently has no honest input.",
+   "No unit-economics or throughput model for Pipeline B: scraper costs are known ($1-5/1k places) but build+QA time per spec site, human-approval workload, expected funnel (sites built -> viewed -> calls -> closes at the research's own 1-5% meeting rate), and pilot kill criteria were never modeled. Without this you cannot tell whether B beats simply doubling down on A.",
+   "The IP/branding policy is unresolved: the research gives conflicting guidance (real logo/photos shown privately vs placeholder branding) and no GAELWORX decision exists on whether spec sites use the prospect's name/logo, owner-uploaded GBP photos only, or AI imagery \u2014 nor a written demo-banner/takedown policy. This must be a fixed rule in the template, not a per-run choice by an autonomous agent.",
+   "Sender infrastructure remains unestablished: DELIVERABILITY.md Phase 0 is explicitly incomplete, yardworx.tech was never verified, and current sends go from the shared agentmail.to domain whose reputation GAELWORX does not control. The research's 'separate warmed domain, 15-20/day ramp' prerequisite has no owned domain, no warm-up started, and no email-verification step wired into the pipeline.",
+   "Verification steps for the wedge signal are unspecified: no 'Google name+city' check that the GBP website field being empty means no site exists, no operational check (recent reviews/working phone) codified, and no handling for unclaimed listings \u2014 the best prospect segment per the research, but the one where review-reply owner-name mining yields nothing and staleness risk is highest. The discovery tool itself (Outscraper vs Apify vs existing Nimble stack) is also unchosen."
+  ],
+  "risks": [
+   "Wasted-build risk (highest): auto-building a deployed website for every no-site lead front-loads the most expensive step before any contact signal exists. With email fill near zero and no calling process, most spec sites will never be seen by anyone. The research's own best practice is call-first (Reese) or build-only-for-shortlisted; an autonomous build-everything pipeline inverts that.",
+   "Legal/IP risk: 'deploy to a public URL' with the prospect's business name, scraped GBP photos, and implied branding is exactly the high-risk quadrant in the research's own matrix (trademark/trade-dress + copyright, plus customer-uploaded photos belonging to reviewers, plus Street View imagery belonging to Google). One angry pool-company owner or their lawyer in a small, gossipy local market can convert the entire outreach motion into reputational damage. Mitigations (owner-photos-only filter, noindex+robots+password, demo banner, private per-prospect URL, expiry, instant takedown) exist in the research but are not enforced anywhere in the plan.",
+   "Deliverability contagion: both pipelines share sending infrastructure, so Pipeline B's inherently dirty list (stale Facebook emails, no SMTP verification wired in) bouncing >3% will torch the same sender domain Pipeline A depends on. Sending from unwarmed/shared agentmail.to with links to just-registered spec-site URLs (fresh domains in links are a classic spam signal) compounds it. Phase 0 must gate BOTH pipelines, and B should use a separate sending domain from A.",
+   "Data-quality/personalization risk: layered enrichment (Sunbiz officer who may be a registered agent or filing service, DBA mismatches, stale Facebook pages, no owner replies on unclaimed listings) compounds to wrong-owner-name and wrong-photo errors at ~70% fill in the best case. Pipeline A has a human review-before-send gate; the plan describes B as 'autonomous' \u2014 removing the gate exactly where error rates are highest.",
+   "Segment-saturation risk: Tampa Bay qualified no-website pool inventory is likely small and this playbook is publicly documented (multiple open-source pipelines target the same wedge), so the pipeline may exhaust its market in weeks. Engineering cost should be sized against a rotate-niche/rotate-geo design from day one or kept deliberately cheap.",
+   "Conversion-ownership risk: every source agrees closes happen on phone calls 2-3, not on the artifact. A CRM record 'flagged for owner to CALL' is where the pipeline's value dies if Zach has no dedicated calling blocks, scripts, and callback discipline. The plan automates the 20% that is cheap and leaves the 80% that converts unowned.",
+   "Fabrication/deception risk in the report card: dollar-loss claims without a real data source violate the repo's own never-fabricate rule and edge toward FDUTPA deceptive-practices territory; likewise the 'I already built you a website' framing must match reality (actually pre-build, or promise a 24-hour preview) or the first question on every call becomes a credibility trap.",
+   "ToS/platform risk: scraping GBP breaches Google's terms regardless of tool; the mitigation (route through third-party scrapers, never mix with a Google Cloud key or the GAELWORX Business Profile/Workspace account) must be a hard rule, or an IP block/account action lands on infrastructure the agency actually depends on.",
+   "Offer-dilution risk: bolting four service-pitch pages (automations, voice agents, software, AI installation) onto the spec-site delivery contradicts every converting script in the research, which leads with ONE observable gap and a low-commitment ask. Multi-pitch pages add build surface, add QA surface, and blur the CTA for an owner viewing on a phone.",
+   "Infrastructure fragility: report/spec URLs tied to a work branch break on merge (documented in HANDOFF.md), no expiry automation means orphaned demo sites accumulate as standing legal exposure, and per-prospect tracking (the research's key prioritization signal) does not exist yet \u2014 without it, follow-up cannot be triaged and the wasted-build problem cannot even be measured."
+  ],
+  "verdict": "Sequence A-then-pilot-B, and do not let B become autonomous end-to-end. Pipeline A is already validated in this repo except for deliverability Phase 0 \u2014 finish that (owned sending subdomain, SPF/DKIM/DMARC, verification, warm-up) and run A at volume first, because it establishes sender reputation, reply-rate baselines, and the Attio/report-card muscle that B reuses. Before writing any B automation, spend one day on a counting scrape to establish the real Tampa Bay no-website pool TAM and measured email/owner-name fill rates (current evidence \u2014 17/17 pool leads with no email, ~2/17 without sites \u2014 suggests both are much worse than the research's generic numbers); if the qualified segment is under ~50 businesses, run B as a manual/semi-automated 10-prospect pilot instead of a pipeline. In that pilot, invert the plan's ordering: qualify and schedule the CALL first, build the spec site second (one hardened pool template with owner-photos-only, demo banner, noindex+password, 7-day expiry, per-prospect tracking on a GAELWORX-owned previews subdomain \u2014 not raw GitHub, which cannot serve HTML), and treat email as a bonus channel, not the spine \u2014 because the fill-rate reality makes B a calling motion with a website artifact, and the research is unanimous that closes happen on calls 2-3. Keep human approval on every deploy and every send, ship v1 without the four service-pitch pages (one gap, one CTA), require a real data source for every dollar claim in the presence report card, and set kill criteria up front (e.g., <20% demo-view rate or <2 calls booked after 25 prospects means stop building and reassess). Only the stages the pilot proves \u2014 scrape, qualify, template render \u2014 earn automation."
+ }
+}
