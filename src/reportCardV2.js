@@ -9,7 +9,35 @@
 //
 // Usage: node src/reportCardV2.js <audit.json> <out.pdf> [--html <out.html>]
 import { readFile, writeFile } from 'node:fs/promises';
+import { readFileSync as rfs } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { renderToFile, closeBrowser } from './render.js';
+
+const __dir = dirname(fileURLToPath(import.meta.url));
+// The GAELWORX coin (triple-hound medallion) — embedded so the PDF is self-contained.
+let COIN = '';
+try { COIN = rfs(join(__dir, '../assets/coin.b64'), 'utf8').trim(); } catch { /* optional */ }
+const coinUri = COIN ? `data:image/png;base64,${COIN}` : '';
+
+// Fonts embedded as base64 @font-face — the render container can't reliably reach
+// fonts.gstatic.com at print time, so a live @import silently falls back to Georgia.
+// Grenze Gotisch = the blackletter display face; Hanken Grotesk = the body face.
+function fontFace(family, weight, file) {
+  try {
+    const b64 = rfs(join(__dir, '../assets/fonts', file)).toString('base64');
+    return `@font-face{font-family:'${family}';font-style:normal;font-weight:${weight};font-display:swap;src:url(data:font/ttf;base64,${b64}) format('truetype')}`;
+  } catch {
+    return '';
+  }
+}
+const FONT_FACE_CSS = [
+  fontFace('Grenze Gotisch', 700, 'grenze700.ttf'),
+  fontFace('Grenze Gotisch', 800, 'grenze800.ttf'),
+  fontFace('Hanken Grotesk', 400, 'hanken400.ttf'),
+  fontFace('Hanken Grotesk', 600, 'hanken600.ttf'),
+  fontFace('Hanken Grotesk', 700, 'hanken700.ttf'),
+].join('\n');
 
 const BOOKING_URL =
   'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1Tq2Xdj7GjrysRzGq_oitD63iIppkWMOtO7SnsNNweoS6oIckUUlYrAOtUjzbOigiyNpAfEa7x';
@@ -45,15 +73,15 @@ const DIM_FIXES = {
 
 // Kit-exact grade math (mirrors render_report.py grade_from_avg).
 export function gradeFromAvg(a) {
-  if (a >= 9) return { grade: 'A', color: '#F1F2F6' };
-  if (a >= 8) return { grade: 'A-', color: '#F1F2F6' };
-  if (a >= 7) return { grade: 'B', color: '#AEB9CC' };
-  if (a >= 6) return { grade: 'B-', color: '#AEB9CC' };
-  if (a >= 5) return { grade: 'C', color: '#E85D04' };
-  if (a >= 4.3) return { grade: 'C-', color: '#E85D04' };
-  if (a >= 3.5) return { grade: 'D+', color: '#C1292E' };
-  if (a >= 2.5) return { grade: 'D', color: '#C1292E' };
-  return { grade: 'F', color: '#C1292E' };
+  if (a >= 9) return { grade: 'A', color: '#E7DECB' };
+  if (a >= 8) return { grade: 'A-', color: '#E7DECB' };
+  if (a >= 7) return { grade: 'B', color: '#D9A441' };
+  if (a >= 6) return { grade: 'B-', color: '#D9A441' };
+  if (a >= 5) return { grade: 'C', color: '#E08A2E' };
+  if (a >= 4.3) return { grade: 'C-', color: '#E08A2E' };
+  if (a >= 3.5) return { grade: 'D+', color: '#C4622F' };
+  if (a >= 2.5) return { grade: 'D', color: '#C4622F' };
+  return { grade: 'F', color: '#A32B22' };
 }
 
 const esc = (s) =>
@@ -178,26 +206,30 @@ export function buildHtml(audit, opts = {}) {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GAELWORX Report Card — ${esc(name)}</title><style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap');
+  ${FONT_FACE_CSS}
   @page { size: A4; margin: 0; }
   :root{
-    --void:#0B0C10; --panel:#1F2833; --panel-2:#161d26; --steel:#2b3644; --steel-line:#4e5a6b;
-    --ink:#F1F2F6; --ink-2:#dfe3ea; --ink-dim:#8D99AE; --ink-faint:#77839a;
-    --forge:#C1292E; --forge-soft:#E85D04; --green:#F1F2F6; --blue:#AEB9CC; --amber:#E85D04; --red:#C1292E;
+    --void:#0C0906; --panel:#17110A; --panel-2:#110C07; --steel:#2A1F13; --steel-line:#57411F;
+    --ink:#E7DECB; --ink-2:#CDBFA8; --ink-dim:#9B8F7D; --ink-faint:#7A6E5C;
+    --forge:#D98A34; --forge-soft:#E9A94F; --green:#D9A441; --blue:#C8894A; --amber:#E08A2E; --red:#C4622F; --ember:#E85D04; --terra:#B5623A; --crit:#A32B22;
     --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
-    --serif:'Bricolage Grotesque','Hanken Grotesk',Arial,sans-serif;
+    --display:'Grenze Gotisch',Georgia,serif;
+    --serif:'Hanken Grotesk',Georgia,serif;
     --sans:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--void);color:var(--ink);font-family:var(--sans);-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .page{width:210mm;height:297mm;margin:0 auto;position:relative;overflow:hidden;
-    background:radial-gradient(120% 70% at 50% -8%, #151a21 0%, var(--void) 58%);
+    background:radial-gradient(120% 75% at 62% -10%, #22160c 0%, var(--void) 60%);
     padding:16mm 15mm 13mm;page-break-after:always}
   .page:last-child{page-break-after:auto}
   .hairline{height:1px;background:linear-gradient(90deg,transparent,var(--steel-line) 10%,var(--steel-line) 90%,transparent)}
+  .coinwm{position:absolute;top:-70px;right:-90px;width:540px;height:auto;opacity:.09;pointer-events:none;z-index:0}
+  .mast,.target,.sec-h,.grid,.block,.wide,.cmp-table,.bottom,.timeline,.cal-cta,.foot,.branch,.ultra,.fixmap,.arsenal-intro,.forge-foot{position:relative;z-index:1}
+  .coin-seal{width:52px;height:52px;object-fit:contain;margin:0 auto 9px;display:block;filter:drop-shadow(0 0 10px rgba(216,138,52,.25))}
   .mast{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding-bottom:12px}
-  .brand .gx{font-family:"Cinzel Decorative",Georgia,serif;font-weight:900;font-size:25px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
-  .brand .gx b{font-weight:700;background:linear-gradient(to top,#C1292E,#E85D04 55%,#F1F2F6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#E85D04}
+  .brand .gx{font-family:var(--display);font-weight:700;font-size:29px;letter-spacing:.02em;color:var(--ink)}
+  .brand .gx b{font-weight:700;background:linear-gradient(to top,#B5623A,#E9A94F 52%,#E7DECB);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#E85D04}
   .brand .tag{font-size:8px;letter-spacing:.30em;text-transform:uppercase;color:var(--ink-faint);margin-top:7px}
   .doc-meta{text-align:right;font-family:var(--mono);font-size:9px;color:var(--ink-dim);line-height:1.8;white-space:nowrap}
   .doc-meta .lbl{color:var(--forge)}
@@ -209,19 +241,19 @@ export function buildHtml(audit, opts = {}) {
   .target{display:flex;justify-content:space-between;align-items:stretch;gap:16px;margin-top:16px}
   .target .who{flex:1;border:2px solid var(--steel-line);background:var(--panel);padding:18px 20px;position:relative}
   .eyebrow{font-size:9px;letter-spacing:.30em;text-transform:uppercase;color:var(--forge);margin-bottom:10px}
-  .biz{font-family:var(--serif);font-size:28px;line-height:1.08;color:var(--ink)}
+  .biz{font-family:var(--display);font-weight:700;font-size:31px;line-height:1.05;color:var(--ink)}
   .url{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:9px;word-break:break-all}
   .flags{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
   .flag{font-family:var(--mono);font-size:9px;letter-spacing:.05em;padding:5px 10px;border:2px solid var(--steel-line);color:var(--ink-2);background:var(--panel-2);text-transform:uppercase}
   .flag.hot{border-color:var(--forge);color:var(--forge-soft)}
   .verdict-box{width:180px;flex:none;border:2px solid var(--steel-line);background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 14px}
   .verdict-box .vlabel{font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-faint)}
-  .grade{font-family:var(--serif);font-size:76px;line-height:.9;font-weight:600;margin:6px 0 4px}
+  .grade{font-family:var(--display);font-size:84px;line-height:.86;font-weight:800;margin:6px 0 4px}
   .avg{font-family:var(--mono);font-size:13px;color:var(--ink-dim)}
   .avg b{color:var(--ink)}
   .sec-h{display:flex;align-items:baseline;gap:13px;margin:24px 0 14px}
   .sec-h .n{font-family:var(--mono);font-size:12px;color:var(--forge)}
-  .sec-h .t{font-family:var(--serif);font-size:18px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+  .sec-h .t{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.02em;text-transform:uppercase;color:var(--ink)}
   .sec-h .r{flex:1;height:1px;background:var(--steel-line);align-self:center;margin-left:6px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px 24px;margin-top:4px}
   .dim{display:flex;align-items:center;gap:11px}
@@ -257,7 +289,7 @@ export function buildHtml(audit, opts = {}) {
   .cmp-table .x{color:var(--red);font-family:var(--mono)}
   .cmp-table .mid{color:var(--amber);font-family:var(--mono)}
   .cmp-rating{font-family:var(--mono);font-size:10px}
-  .bottom{border:2px solid var(--forge);background:linear-gradient(180deg,#261113,#150a0b);padding:18px 21px;margin-top:14px}
+  .bottom{border:2px solid var(--forge);background:linear-gradient(180deg,#2a1a0d,#140c06);padding:18px 21px;margin-top:14px}
   .bottom .bl{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--forge);margin-bottom:11px}
   .bottom p{font-family:var(--serif);font-size:13.5px;line-height:1.6;color:var(--ink)}
   .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:8px;position:relative}
@@ -268,7 +300,7 @@ export function buildHtml(audit, opts = {}) {
   .tl-wk{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--forge);margin-top:9px}
   .tl-title{font-size:10px;font-weight:700;color:var(--ink);margin-top:4px;line-height:1.25}
   .tl-desc{font-size:8.5px;color:var(--ink-dim);margin-top:4px;line-height:1.4}
-  .cal-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;border:2px solid var(--forge);background:linear-gradient(180deg,#261113,#150a0b);padding:13px 18px;margin-top:16px;text-decoration:none}
+  .cal-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;border:2px solid var(--forge);background:linear-gradient(180deg,#2a1a0d,#140c06);padding:13px 18px;margin-top:16px;text-decoration:none}
   .cal-cta .cc-l{font-family:var(--serif);font-size:14px;color:var(--ink);line-height:1.25}
   .cal-cta .cc-l b{color:var(--forge-soft);font-weight:600}
   .cal-cta .cc-btn{flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--void);background:var(--forge);padding:9px 15px;white-space:nowrap}
@@ -282,7 +314,7 @@ export function buildHtml(audit, opts = {}) {
   .br-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
   .br-no{font-family:var(--mono);font-size:10px;color:var(--steel-line);letter-spacing:.05em}
   .br-cat{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--forge)}
-  .br-name{font-family:var(--serif);font-size:26px;color:var(--ink);line-height:1.1}
+  .br-name{font-family:var(--display);font-weight:700;font-size:29px;color:var(--ink);line-height:1.1}
   .br-tag{font-size:11px;color:var(--ink-dim);font-style:italic;margin:5px 0 12px}
   .br-p{font-size:12px;line-height:1.62;color:var(--ink-2)}
   .br-p + .br-p{margin-top:8px}
@@ -299,9 +331,9 @@ export function buildHtml(audit, opts = {}) {
   .fm-arrow{flex:none;color:var(--forge);font-family:var(--mono);font-size:13px}
   .fm-fix{font-size:11.5px;line-height:1.5;color:var(--ink-2)}
   .fm-fix b{color:var(--ink)}
-  .ultra{border:2px solid var(--forge);background:linear-gradient(180deg,#261113,#130a0b);padding:20px 22px;margin-top:14px}
+  .ultra{border:2px solid var(--forge);background:linear-gradient(180deg,#2a1a0d,#130b06);padding:20px 22px;margin-top:14px}
   .ultra .u-cat{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--forge);margin-bottom:7px}
-  .ultra .u-name{font-family:"Cinzel Decorative",Georgia,serif;font-weight:900;font-size:21px;color:var(--ink);letter-spacing:.05em}
+  .ultra .u-name{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.01em;color:var(--ink);letter-spacing:.05em}
   .ultra .u-tag{font-size:11px;color:var(--ink-dim);font-style:italic;margin:6px 0 11px}
   .ultra p{font-size:12px;line-height:1.62;color:var(--ink-2)}
   .ultra p b{color:var(--forge-soft)}
@@ -316,11 +348,12 @@ export function buildHtml(audit, opts = {}) {
 
 <!-- ============ PAGE 1 — THE SITE REPORT: VERDICT + SCORES + LEAKS ============ -->
 <div class="page">
+  ${coinUri ? `<img class="coinwm" src="${coinUri}" alt="">` : ''}
   ${mast('Brand Source of Truth · Automatic Execution · Clan Protected', ref)}
   <div class="target"><div class="who"><div class="eyebrow">Site Audit · ${esc(date)}</div>
     <div class="biz">${esc(name)}</div><div class="url">${esc(biz.url || '')}</div>
     <div class="flags">${flags}</div></div>
-  <div class="verdict-box"><div class="vlabel">Overall Grade</div>
+  <div class="verdict-box">${coinUri ? `<img class="coin-seal" src="${coinUri}" alt="">` : ''}<div class="vlabel">Overall Grade</div>
     <div class="grade" style="color:${color}">${grade}</div><div class="avg">AVG <b>${avg1}</b> / 10</div></div></div>
   <div class="sec-h"><span class="n">01</span><span class="t">Dimensional Scoring</span><span class="r"></span></div>
   <div class="grid">${Object.keys(DIM_LABELS)
@@ -368,7 +401,7 @@ export function buildHtml(audit, opts = {}) {
     ${worst
       .map(
         ([k, v]) =>
-          `<div class="fm-row"><div class="fm-dim"><div class="fmd-l">${esc(DIM_LABELS[k])}</div><div class="fmd-s" style="color:${v >= 7 ? '#F1F2F6' : v >= 4 ? '#E85D04' : '#C1292E'}">${v} / 10</div></div><div class="fm-arrow">→</div><div class="fm-fix">${DIM_FIXES[k] || ''}</div></div>`,
+          `<div class="fm-row"><div class="fm-dim"><div class="fmd-l">${esc(DIM_LABELS[k])}</div><div class="fmd-s" style="color:${v >= 7 ? '#D9A441' : v >= 4 ? '#E08A2E' : '#C4622F'}">${v} / 10</div></div><div class="fm-arrow">→</div><div class="fm-fix">${DIM_FIXES[k] || ''}</div></div>`,
       )
       .join('')}
   </div>
@@ -446,6 +479,7 @@ export function buildHtml(audit, opts = {}) {
     </div>
   </div>
   ${ctaBand('Start the forge — one call, no discovery-call theater. You talk to the people who hold the hammer.')}
+  ${coinUri ? `<img class="coin-seal" src="${coinUri}" alt="" style="width:40px;height:40px;margin-top:14px">` : ''}
   <div class="forge-foot">GAELWORX · <b>gaelworx.com</b> · Point the sword. We take care of the battlefield.</div>
   ${foot(date, 5)}
 </div>
