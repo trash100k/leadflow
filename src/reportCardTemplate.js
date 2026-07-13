@@ -96,7 +96,7 @@ export function buildHtml(audit, assets = {}) {
     { n: '04', h: 'After-hours leads go cold', l: 'Calls and form-fills at 8pm sit until morning. By then they’ve moved on.' },
   ];
   const SOLUTIONS = [
-    { gw: 'GW–02', tag: 'AI Voice Agent', name: 'Maeve answers every call', l: 'Picks up in seconds — day, night, weekend — books the job and texts you the details. No missed call, ever.', fixes: 'Fixes #01 + #04' },
+    { gw: 'GW–02', tag: 'AI Voice Agents', name: 'Every call answered. Every lead chased.', l: 'Inbound, they pick up in seconds — day, night, weekend. Outbound, our outreach agents work your quotes and past customers for you. Appointments booked automatically — you just close.', fixes: 'Fixes #01 + #02 + #04' },
     { gw: 'GW–03', tag: 'Automations', name: 'The busywork runs itself', l: 'Instant quote follow-up, automatic invoicing, and a review engine that fills your Google page while you sleep.', fixes: 'Fixes #02 + #03' },
     { gw: 'GW–01', tag: 'Custom Software', name: 'One screen runs it all', l: 'Jobs, crews, and cash in a single dashboard built around how you actually work — not another app to babysit.', fixes: 'The whole operation' },
     { gw: 'GW–05', tag: 'AI Installation · UltraPlan', name: 'We install the whole forge', l: 'Site, phone, automations, software — set up and maintained by us. You run the trade; the machines run the rest.', fixes: 'Everything, done for you' },
