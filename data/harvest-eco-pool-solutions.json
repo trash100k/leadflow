@@ -1,0 +1,78 @@
+{
+  "name": "ECO Pool Solutions",
+  "slug": "eco-pool-solutions",
+  "phone": "(954) 516-9355",
+  "city": "Coral Springs, FL",
+  "owner_name": "Jorge Contreras",
+  "owner_name_confidence": "confirmed",
+  "services": [
+    "Weekly pool cleaning & skimming",
+    "Water testing & balancing (pH, chlorine, alkalinity, calcium hardness, cyanuric acid)",
+    "Chemical balancing & shock treatments",
+    "Filter cleaning (cartridge, DE, or sand)",
+    "Skimmer & pump basket cleaning",
+    "Equipment inspection (pumps, timers, heaters, chlorinators)",
+    "Leak detection & repair",
+    "Pump motor, impeller, valve, timer clock & saltwater cell replacement",
+    "Pool resurfacing & renovation improvements",
+    "Pool automation, LED lighting, variable-speed pump & heater installation",
+    "Green-to-clean pool restoration",
+    "Commercial pool service",
+    "Pool supplies & equipment sales (DIY owners)"
+  ],
+  "service_area": [
+    "Coral Springs",
+    "Parkland",
+    "West Palm Beach",
+    "Pembroke Pines",
+    "Weston",
+    "Hillsboro Beach",
+    "Cooper City",
+    "Davie",
+    "Fort Lauderdale",
+    "Hallandale Beach",
+    "Coconut Creek",
+    "Dania Beach",
+    "Deerfield Beach",
+    "Hollywood",
+    "Lauderdale Lakes",
+    "Lauderhill",
+    "Lighthouse Point",
+    "Margate",
+    "Miramar",
+    "North Lauderdale",
+    "Oakland Park",
+    "Plantation",
+    "Pompano Beach",
+    "Southwest Ranches",
+    "Sunrise",
+    "Tamarac",
+    "Wilton Manors"
+  ],
+  "reviews": [
+    {
+      "text": "Very reliable service! [text partially redacted by BBB] the owner gave us excellent customer service!",
+      "author": "Alfredo"
+    },
+    {
+      "text": "Muy buen servicio, el técnico es detallista y muy buena atención al cliente.",
+      "author": "Luis C."
+    }
+  ],
+  "photos": [
+    {
+      "url": "https://lirp.cdn-website.com/600fec77/dms3rep/multi/opt/015A6004-e023710e-b4e3b47f-1920w.png",
+      "description": "Staff photo (described in site alt-text as 'a woman in a green sweater smiling for the camera') on the Maintenance services page of ecopoolsolution.com; filename pattern (DSLR camera file number) indicates an original photo rather than a stock image."
+    },
+    {
+      "url": "https://lirp.cdn-website.com/600fec77/dms3rep/multi/opt/PHOTO-2025-05-02-12-12-07+3-1920w.jpg",
+      "description": "\"Before\" photo of a green, algae-filled residential pool from ECO Pool Solutions' own Before & After gallery of completed jobs."
+    },
+    {
+      "url": "https://lirp.cdn-website.com/600fec77/dms3rep/multi/opt/PHOTO-2025-05-02-12-12-05-1920w.jpg",
+      "description": "\"After\" photo of the same pool, now clear blue water, paired with the before photo above on ecopoolsolution.com/before-after."
+    }
+  ],
+  "hours": "Mon-Fri 7:00 AM-8:00 PM; Sat-Sun Closed (per BBB business profile). Google Business Profile independently showed 'Open · Closes 8 PM' consistent with this.",
+  "source_notes": "Services and service-area list harvested from ecopoolsolution.com (home, about, maintenance, repairs, before-after pages) via Nimble map/extract; the site lists 27 individual city landing pages across Broward and Palm Beach counties. Owner name confirmed independently from two sources: the BBB business profile (bbb.org) lists 'Business Management: Mr. Jorge Contreras, Managing Member', and the Florida Sunbiz filing for ECO POOL SOLUTIONS LLC lists an Authorized Person 'CONTRERAS, JORGE L.' at the same business address (12601 NW 6th St, Coral Springs, FL 33071) - full name is likely 'Jorge L. Contreras'. Reviews are from the BBB customer-reviews page; the first ('Alfredo') displays a 'REMOVED' artifact in the source HTML where BBB appears to have redacted a word/name from the original text, quoted here as accurately as possible. Google Maps and Yelp reviews could not be retrieved directly (Google blocks full review text without sign-in; Yelp returned an access-restricted page); Angi returned a 403 error. BBB lists the business as founded/started 9/27/2023, license CPC1460368 (FL DBPR, expires 8/31/2026)."
+}
