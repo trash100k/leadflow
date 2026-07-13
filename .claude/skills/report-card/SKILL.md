@@ -54,7 +54,11 @@ Output: `out/<slug>-card.pdf` sent into chat via SendUserFile.
 
 5. **Render:** `node src/reportCardV2.js out/<slug>.audit.json out/<slug>-card.pdf`
    (fonts + coin are embedded in the renderer; output is the mobile-first
-   4-pager: Bleed → Fix → Leaks → Forge).
+   4-pager: Bleed → Fix → Leaks → Forge). Pages 3–4 are fixed template copy —
+   you only author `costing` + `plan`. Page-4 messaging (if you ever describe
+   it to the user or in an email): **voice + outreach agents** — every call
+   answered, every lead chased, appointments booked automatically, you just
+   close. No personas (no "Maeve") on sales documents.
 
 6. **Deliver into chat:** `SendUserFile` with `out/<slug>-card.pdf`,
    caption = business name + grade + the one-line top pain. `status: normal`.

@@ -72,8 +72,9 @@ ledger.
 P1 THE BLEED (3 short site pain points + grade), P2 THE FIX (worst-3 dims
 from→to + 30-day checklist + CTA), P3 THE LEAKS (4 universal business
 bottlenecks: missed calls, slow quotes, busywork, after-hours), P4 THE FORGE
-(GAELWORX solutions each tagged to the leak it plugs — Maeve, automations,
-software, **UltraPlan** — + CTA). Brand: warm forged-iron palette, blackletter
+(GAELWORX solutions each tagged to the leak it plugs — voice + outreach
+agents, automations, software, **UltraPlan** — + CTA). Brand: warm
+forged-iron palette, blackletter
 (Grenze Gotisch) + Hanken, coin watermark, all embedded. The official kit
 remains the deep-dive variant. Two tightenings:
 - Attio writes via REST (§1 rule).
