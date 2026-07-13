@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>GAELWORX — Report Card Generator</title>
+<style>
+  :root{
+    --void:#0C0906; --panel:#17110A; --steel-line:#57411F; --ink:#E7DECB; --ink-dim:#9B8F7D;
+    --forge:#D98A34; --ember:#E85D04; --terra:#B5623A;
+    --sans:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--void);color:var(--ink);font-family:var(--sans);min-height:100vh;
+    padding:max(24px,env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+    background:radial-gradient(120% 60% at 60% -5%, #22160c 0%, var(--void) 55%)}
+  .wrap{max-width:520px;margin:0 auto}
+  .brand{font-family:'Grenze Gotisch',Georgia,serif;font-weight:700;font-size:34px;letter-spacing:.02em;text-align:center;margin:8px 0 2px}
+  .brand .ae{background:linear-gradient(to top,#B5623A,#E9A94F 52%,#E7DECB);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{text-align:center;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:26px}
+  label{display:block;font-size:13px;letter-spacing:.04em;color:var(--forge);font-weight:700;text-transform:uppercase;margin:16px 0 7px}
+  input{width:100%;font-family:var(--sans);font-size:17px;color:var(--ink);background:var(--panel);
+    border:2px solid var(--steel-line);border-radius:4px;padding:14px 15px;outline:none}
+  input:focus{border-color:var(--forge)}
+  .btn{display:block;width:100%;font-family:var(--sans);font-weight:800;font-size:17px;letter-spacing:.02em;
+    color:#160c05;background:var(--ember);border:none;border-radius:4px;padding:16px;margin-top:22px;cursor:pointer}
+  .btn:disabled{opacity:.5}
+  .btn.ghost{background:transparent;color:var(--ink-dim);border:2px solid var(--steel-line);font-weight:700}
+  .btn.terra{background:var(--terra);color:#160c05}
+  .row{display:flex;gap:10px}
+  .hint{font-size:13px;color:var(--ink-dim);margin-top:10px;line-height:1.5;text-align:center}
+  .toggle{text-align:center;margin-top:18px}
+  .toggle a{color:var(--forge);font-size:14px;text-decoration:underline;cursor:pointer}
+  .err{background:#2a1110;border:2px solid var(--terra);color:#f0c9bd;font-size:14px;line-height:1.5;padding:13px 15px;border-radius:4px;margin-top:16px;display:none}
+  .status{text-align:center;color:var(--forge);font-size:15px;margin-top:18px;display:none}
+  .spin{display:inline-block;width:15px;height:15px;border:2px solid var(--steel-line);border-top-color:var(--ember);border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;margin-right:8px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  #manual{display:none}
+  #manual .pain{margin-top:10px}
+  #manual input{font-size:15px;padding:11px 13px}
+  /* preview */
+  #preview{display:none;position:fixed;inset:0;background:#000;z-index:50;flex-direction:column}
+  #frameWrap{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;padding:10px 0}
+  #frame{width:794px;border:0;background:#0C0906;transform-origin:top center}
+  .bar{display:flex;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));background:#140d07;border-top:2px solid var(--steel-line)}
+  .bar .btn{margin:0;flex:1;padding:14px}
+  @media print{ body *{visibility:hidden} }
+</style>
+</head>
+<body>
+  <div class="wrap" id="form">
+    <div class="brand">G<span class="ae">AE</span>LWORX</div>
+    <div class="sub">Report Card Generator</div>
+
+    <div id="auto">
+      <label>Business website</label>
+      <input id="url" type="url" inputmode="url" autocapitalize="off" autocorrect="off" placeholder="floridapowerservices.com" />
+      <label>Business name <span style="color:var(--ink-dim);text-transform:none;font-weight:400">(optional)</span></label>
+      <input id="name" type="text" placeholder="leave blank to auto-detect" />
+      <button class="btn" id="go">⚡ Generate report card</button>
+      <div class="hint">Reads the site, grades it, and builds the branded PDF. On the next screen tap <b>Save PDF</b> → then text it.</div>
+    </div>
+
+    <div id="manual">
+      <label>Business name</label>
+      <input id="mName" type="text" placeholder="SunStack Solar" />
+      <label>Website (shown on the card)</label>
+      <input id="mUrl" type="text" placeholder="sunstacksolar.com" />
+      <label>Overall grade</label>
+      <input id="mGrade" type="text" placeholder="C" maxlength="2" />
+      <label>Pain point 1</label>
+      <input class="pain" id="p1h" placeholder="Headline — e.g. Invisible in Google search" />
+      <input class="pain" id="p1l" placeholder="One plain line about what it costs" />
+      <label>Pain point 2</label>
+      <input class="pain" id="p2h" placeholder="Headline" />
+      <input class="pain" id="p2l" placeholder="One plain line" />
+      <label>Pain point 3</label>
+      <input class="pain" id="p3h" placeholder="Headline" />
+      <input class="pain" id="p3l" placeholder="One plain line" />
+      <button class="btn" id="goManual">⚡ Build report card</button>
+    </div>
+
+    <div class="status" id="status"><span class="spin"></span><span id="statusText">Reading the site…</span></div>
+    <div class="err" id="err"></div>
+    <div class="toggle"><a id="switchManual">Enter details manually instead →</a></div>
+  </div>
+
+  <div id="preview">
+    <div id="frameWrap"><iframe id="frame"></iframe></div>
+    <div class="bar">
+      <button class="btn ghost" id="back">← Back</button>
+      <button class="btn terra" id="pdf">Save PDF</button>
+    </div>
+  </div>
+
+<script type="module">
+import { buildHtml, gradeFromAvg } from './reportCardTemplate.js';
+import { coinUri, fontCss } from './assets.js';
+
+const $ = (id) => document.getElementById(id);
+const show = (el, on = true) => (el.style.display = on ? '' : 'none');
+const err = (msg) => { const e = $('err'); e.textContent = msg; e.style.display = msg ? 'block' : 'none'; };
+const status = (msg) => { $('statusText').textContent = msg; show($('status'), !!msg); };
+
+function render(audit) {
+  const html = buildHtml(audit, { coinUri, fontCss });
+  const frame = $('frame');
+  frame.srcdoc = html;
+  frame.onload = fitFrame;
+  show($('preview'));
+  $('preview').style.display = 'flex';
+}
+function fitFrame() {
+  const frame = $('frame');
+  const scale = Math.min(1, ($('frameWrap').clientWidth - 8) / 794);
+  frame.style.transform = `scale(${scale})`;
+  try {
+    const h = frame.contentDocument.body.scrollHeight;
+    frame.style.height = h + 'px';
+    frame.style.marginBottom = (h * scale - h) + 'px';
+  } catch {}
+}
+window.addEventListener('resize', fitFrame);
+
+$('go').onclick = async () => {
+  const url = $('url').value.trim();
+  if (!url) return err('Enter a website first.');
+  err(''); $('go').disabled = true; status('Reading the site…');
+  try {
+    const r = await fetch('/api/audit', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url, name: $('name').value.trim() || undefined }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      status('');
+      err(data.message || 'Audit failed.');
+      if (data.error === 'no_key') switchToManual();
+      return;
+    }
+    status('Building your card…');
+    render(data);
+  } catch (e) {
+    err('Network error: ' + e.message);
+  } finally {
+    $('go').disabled = false; status('');
+  }
+};
+
+// Manual mode — synthesize a minimal audit from typed fields.
+const GRADE_TO_AVG = { A: 9.2, 'A-': 8.5, B: 7.2, 'B-': 6.2, C: 5.2, 'C-': 4.5, 'D+': 3.7, D: 2.8, F: 1.8 };
+$('goManual').onclick = () => {
+  const g = ($('mGrade').value.trim().toUpperCase() || 'C');
+  const avg = GRADE_TO_AVG[g] ?? 5.2;
+  // Flat scores at the grade level, with the AI dims dragged low (GAELWORX's angle) so page-2 fixes populate.
+  const s = Math.round(avg);
+  const scores = { design: s, mobile: s, tech_seo: s, local_seo: s, content_eeat: s, aeo: Math.max(1, s - 2), geo: Math.max(1, s - 2), agentic: Math.max(1, s - 3), accessibility: s, cro: s };
+  const pains = [['p1h','p1l'],['p2h','p2l'],['p3h','p3l']]
+    .map(([h,l]) => ({ title: $(h).value.trim(), detail: $(l).value.trim() }))
+    .filter((p) => p.title);
+  if (!$('mName').value.trim()) return err('Enter the business name.');
+  if (!pains.length) return err('Add at least one pain point.');
+  err('');
+  render({
+    business: { name: $('mName').value.trim(), url: $('mUrl').value.trim() },
+    scores, flags: [],
+    costing: pains,
+    plan: [
+      { title: 'Rebuild the homepage as a lead engine', phase: 'near' },
+      { title: 'Add tap-to-call + a fast mobile layout', phase: 'near' },
+      { title: 'Make you visible to Google & AI search', phase: 'later' },
+      { title: 'Wire up reviews, quotes & follow-up', phase: 'later' },
+    ],
+  });
+};
+
+function switchToManual() { show($('auto'), false); show($('manual'), true); $('switchManual').textContent = 'Use a website URL instead →'; }
+function switchToAuto() { show($('auto'), true); show($('manual'), false); $('switchManual').textContent = 'Enter details manually instead →'; }
+$('switchManual').onclick = () => ($('manual').style.display === 'none' ? switchToManual() : switchToAuto());
+
+$('back').onclick = () => { $('preview').style.display = 'none'; };
+$('pdf').onclick = () => {
+  const f = $('frame');
+  try { f.contentWindow.focus(); f.contentWindow.print(); }
+  catch { window.print(); }
+};
+</script>
+</body>
+</html>

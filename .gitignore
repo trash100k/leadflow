@@ -6,3 +6,5 @@ out/
 data/leads.jsonl
 *.pyc
 __pycache__/
+webapp/public/assets.js
+webapp/public/reportCardTemplate.js

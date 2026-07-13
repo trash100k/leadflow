@@ -36,6 +36,27 @@
 (or via `node src/prepare.js <lead.json>`, which writes the audit.json and calls the kit).
 Three-tier fallback (chromium → weasyprint → html-only) always produces a deliverable.
 
+## Pain-point copy (drives the mobile outreach card — `reportCardV2`)
+The `costing` items become the three big pain points on page 1 of the outreach
+card, so write them for the **owner**, not an SEO. The renderer shows each
+`title` as the headline and the **first sentence** of `detail` as the plain
+line beneath it.
+
+- **`title` = the pain the owner feels, in plain words.** Lead with the money/
+  customer consequence, not the technical cause.
+  - ✗ "No AggregateRating in schema — 75 reviews invisible to AI"
+  - ✓ "Your 75 five-star reviews are invisible in Google search"
+  - ✗ "Missing meta description / weak title tags"
+  - ✓ "You're losing clicks to competitors before anyone sees your site"
+  - ✗ "No LocalBusiness JSON-LD; agent-blind"
+  - ✓ "When someone asks ChatGPT for a company like yours, you don't come up"
+- **`detail` first sentence = plain explanation + what it costs** (calls, jobs,
+  trust). Put any technical note in a later sentence, not the first.
+- No jargon in the first sentence: avoid "schema," "JSON-LD," "meta," "H1,"
+  "LCP," "aggregateRating" up front — name the effect a homeowner understands.
+- Still **true and specific** to what you observed — plain ≠ vague, and never
+  invent a number or a review you didn't see.
+
 ## Never fabricate
 A score, review, competitor, statistic, or email. Where unobserved, use the
 documented status values rather than guessing. Better to skip than to invent.
