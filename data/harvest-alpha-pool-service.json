@@ -1,0 +1,54 @@
+{
+  "name": "Alpha Pool Service",
+  "slug": "alpha-pool-service",
+  "phone": "(727) 510-2029",
+  "city": "St. Petersburg, FL (Kenneth City, FL 33709)",
+  "owner_name": "Jacob",
+  "owner_name_confidence": "inferred",
+  "services": [
+    "Vacuuming",
+    "Filter cleaning",
+    "Wall brushing",
+    "Water treatment & chemical balancing",
+    "Leaf trap installation & maintenance",
+    "Salt cell cleaning & adjustment",
+    "One-time green-to-clean rescue cleanings",
+    "Pool opening & closing service",
+    "Snowbird / vacation pool watch service"
+  ],
+  "service_area": [
+    "St. Petersburg",
+    "Pinellas Park",
+    "Seminole",
+    "Gulfport",
+    "Treasure Island",
+    "Kenneth City",
+    "Lealman",
+    "Bay Pines",
+    "Madeira Beach",
+    "Tierra Verde",
+    "St. Pete Beach"
+  ],
+  "reviews": [
+    {
+      "text": "Had a nasty green pool and wasn't sure if it was able to be saved or not. Jacob was very knowledgable/friendly when it came to explaining things and on top of it was able to save the pool. 10/10 would recommend if you're looking for a pool tech.",
+      "author": "Gabe Hayes (Google review)"
+    },
+    {
+      "text": "Really good service. Jacob is fair priced and continues to show up weekly without any issues. We had a small leak at the filter that he pointed out and he helped us get our pool crystal clear.",
+      "author": "Natasha Peoples (Google review)"
+    },
+    {
+      "text": "Alpha Pool Service provided excellent service from start to finish. Jacob has Great communication, attention to detail, and consistent quality work.",
+      "author": "Miguel Cortez (Google review)"
+    }
+  ],
+  "photos": [
+    {
+      "url": "https://img1.wsimg.com/isteam/ip/92e85492-1885-40b8-86d4-399e39aea5b5/IMG_6564.jpeg",
+      "description": "Service truck with a water-themed design, from the business's own \"About Us\" page on alphapoolservice727.com"
+    }
+  ],
+  "hours": "Mon-Fri 9:00 AM-6:00 PM, Sat 9:30 AM-6:30 PM, Sunday closed",
+  "source_notes": "This is the one finalist with an existing website (alphapoolservice727.com), so it was harvested directly via Nimble extract of the home, pool-cleaning-services, about-us, and gallery pages, cross-checked against Yelp, Facebook, Instagram, and GBP (Nimble location search: place_id ChIJZSY42eKH2q8ROYF3Z25Rcfs, address 5905 54th Ave N / site lists 5903 54th Ave N - same block, likely a minor listing discrepancy). Services and service-area lists are copied near-verbatim from the business's own 'Pool Cleaning Services' and service-area copy (explicitly states Pinellas County plus the named neighborhoods). Owner name 'Jacob' is INFERRED: the business's claimed Birdeye profile (reviews.birdeye.com/alpha-pool-service-170431037794317) surfaces 5 independent Google reviews spanning 2 years that all name 'Jacob' as the person who personally performs every visit ('I hired Jacob', 'continues to show up weekly', 'Jacob was very knowledgeable') - strong behavioral signal of ownership, but no last name or Sunbiz officer record could be matched to confirm it (the Instagram bio references 'A JRG enterprise Inc. company' but no matching active Sunbiz corporation for 'JRG Enterprise/Enterprises' in Pinellas County, active since 2023, could be located - closest matches were unrelated/inactive entities elsewhere in FL). Review quotes are the 3 strongest of 5 available, all with first+last name Google reviewers. One clearly business-owned photo was recovered (truck photo with descriptive alt text); the site's broader photo gallery is JavaScript/lazy-load rendered and additional images could not be reliably extracted or described, so they were omitted rather than guessed at."
+}
