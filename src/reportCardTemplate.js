@@ -215,7 +215,7 @@ export function buildHtml(audit, assets = {}) {
 
 <!-- ===== PAGE 1 — THE BLEED ===== -->
 <div class="page">
-  ${coinUri ? `<img class="coinwm" src="${coinUri}" alt="">` : ''}
+  ${coinUri ? `<img class="coinwm" src="${coinUri}" alt="" onerror="this.style.display=&#39;none&#39;">` : ''}
   ${mast('Website Report Card')}
   <div class="idrow">
     <div><div class="eyebrow">Prepared for</div><div class="biz">${esc(name)}</div><div class="url">${esc(biz.url || '')}</div></div>
@@ -254,7 +254,7 @@ export function buildHtml(audit, assets = {}) {
 
 <!-- ===== PAGE 4 — THE FORGE (solutions) ===== -->
 <div class="page">
-  ${coinUri ? `<img class="coinwm" src="${coinUri}" alt="">` : ''}
+  ${coinUri ? `<img class="coinwm" src="${coinUri}" alt="" onerror="this.style.display=&#39;none&#39;">` : ''}
   ${mast('Point the sword · The Forge')}
   <div class="eyebrow" style="margin-top:22px">What we install</div>
   <div class="h1">One system. It plugs <span class="amb">every leak.</span></div>

@@ -95,7 +95,11 @@
 
 <script type="module">
 import { buildHtml, gradeFromAvg } from './reportCardTemplate.js';
-import { coinUri, fontCss } from './assets.js';
+// The report renders in the viewer's browser (a phone), which reaches Google
+// Fonts and GitHub raw fine — so we link them instead of embedding ~400KB.
+// The coin img hides itself (onerror) if the URL ever fails.
+const fontCss = "@import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@700&family=Hanken+Grotesk:wght@400;700&display=swap');";
+const coinUri = 'https://raw.githubusercontent.com/trash100k/leadflow/claude/n8n-email-pdf-workflow-8qsge5/assets/coin.png';
 
 const $ = (id) => document.getElementById(id);
 const show = (el, on = true) => (el.style.display = on ? '' : 'none');
