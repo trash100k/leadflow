@@ -87,7 +87,7 @@ git commit -m "Publish <slug> report card" && git push
 # raw URL: https://raw.githubusercontent.com/trash100k/leadflow/<BRANCH>/reports/<slug>.pdf
 ```
 (Confirm reachable: `curl -sI <raw_url>` → 200. Note: branch is currently
-`claude/n8n-email-pdf-workflow-8qsge5`; update to `main` after merge.)
+`main`; update to `main` after merge.)
 
 **8. Push to Attio** (workspace GaelWorx; via `mcp__Attio__*`):
 - `upsert-record` object `companies`, matching `domains` → {name, domains:[domain],

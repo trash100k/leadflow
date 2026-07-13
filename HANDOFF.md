@@ -48,7 +48,7 @@ node src/prepare.js out/<slug>.lead.json      # -> out/<slug>.audit.json + out/<
 # 6. Host it — one commit hosts many
 cp out/<slug>.pdf reports/<slug>.pdf
 git add -f reports/<slug>.pdf && git commit -m "Publish <slug> report card" && git push
-RAW="https://raw.githubusercontent.com/trash100k/leadflow/claude/n8n-email-pdf-workflow-8qsge5/reports/<slug>.pdf"
+RAW="https://raw.githubusercontent.com/trash100k/leadflow/main/reports/<slug>.pdf"
 curl -sI "$RAW" | head -1     # expect: HTTP/2 200
 
 # 7. Deliver via AgentMail  (mcp__AgentMail__send_message)
@@ -102,7 +102,7 @@ since some route PITCH_OTHER/SKIP.
 
 ## Key constants
 
-- **Repo:** `trash100k/leadflow` · **branch:** `claude/n8n-email-pdf-workflow-8qsge5`
+- **Repo:** `trash100k/leadflow` · **branch:** `main`
   (update raw URLs to `main` after merge).
 - **AgentMail inboxes (all live, all send now):** `zach-gaelworx@agentmail.to`
   (primary, "Zach · GAELWORX"), `gaelworx@agentmail.to`, `gaelworx-outreach@agentmail.to`.

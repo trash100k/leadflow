@@ -4,7 +4,7 @@
 // Usage: node scripts/attio-prep.js <fileBase> <email> <route>
 import { readFile } from 'node:fs/promises';
 
-const RAWBASE = 'https://raw.githubusercontent.com/trash100k/leadflow/claude/n8n-email-pdf-workflow-8qsge5/reports';
+const RAWBASE = 'https://raw.githubusercontent.com/trash100k/leadflow/main/reports';
 const [, , fileBase, email = '', route = 'AUDIT'] = process.argv;
 
 function gradeFromAvg(a) {
